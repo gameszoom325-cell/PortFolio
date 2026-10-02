@@ -42,16 +42,17 @@ import {
 } from 'lucide-react';
 
 /* =========================================================================
-   REUSABLE BI-DIRECTIONAL SCROLL ANIMATION CONFIGURATION
-   Scroll Down = Reveal, Scroll Up = Exit
+   SCENE-BASED SCROLL TRANSITION CONFIGURATION
+   Full Viewport Snapping / Section Morph
    ========================================================================= */
-const biDirectionalScroll = {
-  viewport: { once: false, amount: 0.25 },
-  initial: { opacity: 0, y: 60, filter: 'blur(6px)' },
-  whileInView: { opacity: 1, y: 0, filter: 'blur(0px)' },
-  exit: { opacity: 0, y: -40, filter: 'blur(4px)' },
-  transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] }
+const sceneTransition = {
+  initial: { opacity: 0, y: 80, scale: 1.05, filter: "blur(6px)" },
+  whileInView: { opacity: 1, y: 0, scale: 1, filter: "blur(0px)" },
+  exit: { opacity: 0, y: -60, scale: 0.95, filter: "blur(8px)" },
+  viewport: { once: false, amount: 0.3 },
+  transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] }
 };
+const biDirectionalScroll = sceneTransition;
 
 /* =========================================================================
    1. CYBERNETIC SOUND SYNTHESIZER (Web Audio API - Zero External Assets)
@@ -277,9 +278,9 @@ export function AtmosphericCanvas({ isDark }) {
     const mouse = { x: -2000, y: -2000, active: false };
     const particles = [];
 
-    // SPEC 3: Bright purple/orange on Dark; subtle deep slate/gray on Light
-    const darkPalette = ['#f97316', '#a855f7', '#fb923c', '#c084fc', '#e11d48'];
-    const lightPalette = ['#334155', '#475569', '#64748b', '#94a3b8', '#7c3aed'];
+    // Night City Highway Palette: Electric Amber, Warm Gold, Hot Magenta, Crimson Pink, Blaze Orange
+    const darkPalette = ['#fcee0a', '#ffaa00', '#ff0055', '#ff007f', '#f97316'];
+    const lightPalette = ['#334155', '#475569', '#64748b', '#94a3b8', '#e11d48'];
     const activePalette = isDark ? darkPalette : lightPalette;
 
     for (let i = 0; i < count; i++) {
@@ -434,9 +435,9 @@ export function AtmosphericCanvas({ isDark }) {
             ctx.moveTo(p.x, p.y);
             ctx.lineTo(p2.x, p2.y);
             ctx.strokeStyle = isDark
-              ? p.color === '#f97316'
-                ? `rgba(249, 115, 22, ${alpha})`
-                : `rgba(168, 85, 247, ${alpha})`
+              ? p.color === '#ffaa00' || p.color === '#fcee0a'
+                ? `rgba(255, 170, 0, ${alpha * 1.3})`
+                : `rgba(255, 0, 85, ${alpha * 1.1})`
               : `rgba(71, 85, 105, ${alpha})`;
             ctx.lineWidth = isDark ? 0.85 : 0.75;
             ctx.stroke();
@@ -645,7 +646,7 @@ export function HolographicProjectCard({
         }}
         className={`group relative rounded-xl p-6 flex flex-col justify-between overflow-hidden transition-all duration-300 cyber-corner-tr h-full cursor-default ${
           isDark
-            ? 'bg-[#0f0f13]/90 border border-orange-500/25 hover:border-orange-400 hover:shadow-[0_0_35px_rgba(249,115,22,0.2)] text-[#f3f4f6]'
+            ? 'bg-slate-950/70 border border-amber-500/30 shadow-[0_0_20px_rgba(255,170,0,0.15)] hover:border-pink-500 hover:shadow-[0_0_25px_rgba(255,0,85,0.3)] text-zinc-100'
             : 'bg-white border border-gray-200 shadow-xl hover:shadow-2xl hover:border-purple-400 text-[#0f172a]'
         }`}
       >
@@ -653,25 +654,25 @@ export function HolographicProjectCard({
           className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"
           style={{
             background: isDark
-              ? `radial-gradient(400px circle at ${sheen.x}% ${sheen.y}%, rgba(249, 115, 22, 0.12), transparent 70%)`
+              ? `radial-gradient(400px circle at ${sheen.x}% ${sheen.y}%, rgba(255, 170, 0, 0.16), rgba(255, 0, 85, 0.08), transparent 70%)`
               : `radial-gradient(400px circle at ${sheen.x}% ${sheen.y}%, rgba(168, 85, 247, 0.08), transparent 70%)`
           }}
         />
 
         <div className="absolute top-0 right-0 w-8 h-8 pointer-events-none">
           <div className={`absolute top-2 right-2 w-2 h-2 rounded-sm transition-colors ${
-            isDark ? 'bg-orange-400 group-hover:bg-purple-400' : 'bg-purple-500 group-hover:bg-orange-500'
+            isDark ? 'bg-amber-400 group-hover:bg-pink-500 shadow-[0_0_8px_#ffaa00]' : 'bg-purple-500 group-hover:bg-orange-500'
           }`} />
         </div>
 
         <div className="relative z-10 space-y-4">
           <div className="flex items-center justify-between text-xs font-mono">
-            <span className={`font-semibold tracking-wider uppercase ${isDark ? 'text-orange-400' : 'text-orange-600'}`}>
+            <span className={`font-semibold tracking-wider uppercase ${isDark ? 'text-amber-400 text-glow-amber' : 'text-orange-600'}`}>
               {project.category}
             </span>
             <span className={`px-2.5 py-0.5 rounded-full text-[11px] ${
               isDark
-                ? 'bg-purple-950/80 border border-purple-500/40 text-purple-300'
+                ? 'bg-pink-950/80 border border-pink-500/40 text-pink-300 shadow-[0_0_10px_rgba(255,0,85,0.25)]'
                 : 'bg-purple-50 border border-purple-200 text-purple-700 font-medium'
             }`}>
               {project.badge}
@@ -680,7 +681,7 @@ export function HolographicProjectCard({
 
           <div>
             <h3 className={`text-xl font-bold font-tech transition-colors flex items-center justify-between ${
-              isDark ? 'text-white group-hover:text-orange-300' : 'text-slate-900 group-hover:text-purple-600'
+              isDark ? 'text-white group-hover:text-amber-300' : 'text-slate-900 group-hover:text-purple-600'
             }`}>
               <span>{project.title}</span>
               <button
@@ -690,28 +691,28 @@ export function HolographicProjectCard({
                   onInspect();
                 }}
                 className={`p-1 rounded transition-colors cursor-pointer ${
-                  isDark ? 'hover:bg-slate-800 text-slate-500 hover:text-orange-400' : 'hover:bg-slate-100 text-slate-400 hover:text-purple-600'
+                  isDark ? 'hover:bg-slate-800 text-slate-500 hover:text-amber-400' : 'hover:bg-slate-100 text-slate-400 hover:text-purple-600'
                 }`}
                 title="Inspect Architecture"
               >
                 <Maximize2 className="w-4 h-4" />
               </button>
             </h3>
-            <p className={`mt-2 text-xs sm:text-sm font-mono leading-relaxed ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
+            <p className={`mt-2 text-xs sm:text-sm font-mono leading-relaxed ${isDark ? 'text-zinc-200 [text-shadow:0_1px_4px_rgba(0,0,0,0.8)]' : 'text-slate-600'}`}>
               {project.description}
             </p>
           </div>
 
           {project.stats && project.stats.length > 0 && (
             <div className={`grid grid-cols-2 gap-2 py-2 border-y font-mono text-xs ${
-              isDark ? 'border-slate-800/80' : 'border-slate-200'
+              isDark ? 'border-amber-500/20' : 'border-slate-200'
             }`}>
               {project.stats.slice(0, 2).map((s, idx) => (
                 <div key={idx} className={`p-2 rounded border ${
-                  isDark ? 'bg-black/40 border-slate-800/80' : 'bg-slate-50 border-slate-200'
+                  isDark ? 'bg-black/60 border-amber-500/20' : 'bg-slate-50 border-slate-200'
                 }`}>
                   <div className={`text-[10px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{s.label}</div>
-                  <div className={`font-bold tabular-nums ${isDark ? 'text-orange-300' : 'text-purple-700'}`}>
+                  <div className={`font-bold tabular-nums ${isDark ? 'text-amber-300' : 'text-purple-700'}`}>
                     {s.value} <span className="text-[10px] opacity-75">{s.unit}</span>
                   </div>
                 </div>
@@ -725,7 +726,7 @@ export function HolographicProjectCard({
                 key={idx}
                 className={`px-2 py-0.5 text-[10px] font-mono rounded border transition-colors ${
                   isDark
-                    ? 'bg-slate-900/90 text-slate-300 border-slate-800 group-hover:border-orange-500/30'
+                    ? 'bg-slate-950/80 text-amber-200/90 border-amber-500/20 group-hover:border-pink-500/40'
                     : 'bg-slate-100 text-slate-700 border-slate-200 group-hover:border-purple-300'
                 }`}
               >
@@ -737,7 +738,7 @@ export function HolographicProjectCard({
 
         {/* Card Action Buttons */}
         <div className={`relative z-10 pt-5 mt-4 border-t flex items-center justify-between gap-3 text-xs font-mono ${
-          isDark ? 'border-slate-800/80' : 'border-slate-200'
+          isDark ? 'border-amber-500/20' : 'border-slate-200'
         }`}>
           <button
             onClick={() => {
@@ -746,11 +747,11 @@ export function HolographicProjectCard({
             }}
             onMouseEnter={sfx.playHover}
             className={`flex items-center gap-1.5 transition-colors cursor-pointer ${
-              isDark ? 'text-slate-400 hover:text-orange-300' : 'text-slate-600 hover:text-purple-600'
+              isDark ? 'text-slate-300 hover:text-amber-300' : 'text-slate-600 hover:text-purple-600'
             }`}
           >
             <span>INSPECT SPEC</span>
-            <ChevronRight className={`w-3.5 h-3.5 ${isDark ? 'text-orange-400' : 'text-purple-600'}`} />
+            <ChevronRight className={`w-3.5 h-3.5 ${isDark ? 'text-amber-400' : 'text-purple-600'}`} />
           </button>
 
           <div className="flex items-center gap-2">
@@ -765,7 +766,7 @@ export function HolographicProjectCard({
               onMouseEnter={sfx.playHover}
               className={`p-2 rounded-lg border transition-colors cursor-pointer ${
                 isDark
-                  ? 'bg-slate-900 border-slate-800 hover:border-orange-500/50 text-slate-300 hover:text-white'
+                  ? 'bg-slate-900 border-amber-500/30 hover:border-amber-400 text-slate-300 hover:text-amber-300'
                   : 'bg-white border-slate-300 hover:border-purple-400 text-slate-700 hover:text-purple-600 shadow-xs'
               }`}
               title="View Repository"
@@ -784,7 +785,7 @@ export function HolographicProjectCard({
               onMouseEnter={sfx.playHover}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold transition-all shadow-sm cursor-pointer ${
                 isDark
-                  ? 'bg-orange-500/20 hover:bg-orange-500/30 border border-orange-400/60 hover:border-orange-400 text-orange-300 hover:text-orange-100 shadow-[0_0_12px_rgba(249,115,22,0.2)]'
+                  ? 'bg-gradient-to-r from-amber-400 to-pink-500 hover:brightness-110 text-slate-950 font-bold shadow-[0_0_15px_rgba(255,170,0,0.4)]'
                   : 'bg-purple-600 hover:bg-purple-700 text-white shadow-xs'
               }`}
             >
@@ -1543,6 +1544,197 @@ export function SkillsTelemetryGrid({ sfx, isDark }) {
 }
 
 /* =========================================================================
+   7. PINNED VERTICAL SOCIAL RIBBON (Right Edge Dock)
+   ========================================================================= */
+export function SocialRibbon({ sfx, onCopyEmail }) {
+  const socialLinks = [
+    {
+      id: 'github',
+      label: 'GITHUB // AYUSH',
+      icon: Github,
+      href: 'https://github.com/gameszoom325-cell',
+      isExternal: true,
+    },
+    {
+      id: 'linkedin',
+      label: 'LINKEDIN // AYUSH',
+      icon: Linkedin,
+      href: 'https://www.linkedin.com/in/ayush-singh-705a63397?utm_source=share_via&utm_content=profile&utm_medium=member_android',
+      isExternal: true,
+    },
+    {
+      id: 'instagram',
+      label: 'INSTAGRAM // AYUSH',
+      icon: Instagram,
+      href: 'https://www.instagram.com/ayush.rxt_?stkn=aDM1NDE1ZnV1bXBw',
+      isExternal: true,
+    },
+    {
+      id: 'email',
+      label: 'EMAIL // AYUSH',
+      icon: Mail,
+      onClick: onCopyEmail,
+      isExternal: false,
+    },
+  ];
+
+  return (
+    <aside
+      aria-label="Social Channels"
+      className="fixed right-3 sm:right-4 top-1/2 -translate-y-1/2 z-40 flex flex-col pointer-events-auto"
+    >
+      <div className="flex flex-col items-center gap-2.5 py-3.5 px-2 rounded-2xl bg-[#0a050d]/85 backdrop-blur-md border border-amber-500/30 shadow-[0_0_25px_rgba(255,170,0,0.15)]">
+        {/* Top Indicator */}
+        <div className="w-1 h-3 rounded-full bg-gradient-to-b from-amber-400 to-pink-500 shadow-[0_0_8px_#ffaa00]" />
+
+        {socialLinks.map((item) => {
+          const Icon = item.icon;
+          const buttonInner = (
+            <div className="relative group flex items-center justify-end">
+              {/* Expanding glowing amber/pink tooltip pill on the left */}
+              <div className="absolute right-full mr-3 px-3 py-1 rounded-full bg-[#0a050d]/95 border border-pink-500/60 text-[10px] font-mono font-bold text-amber-300 tracking-wider whitespace-nowrap opacity-0 group-hover:opacity-100 translate-x-2 group-hover:translate-x-0 transition-all duration-200 pointer-events-none shadow-[0_0_15px_rgba(255,0,85,0.4)]">
+                {item.label}
+              </div>
+
+              {/* Icon Container: slides 6px left toward center with amber illumination */}
+              <div
+                className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-300 transition-all duration-200 group-hover:-translate-x-1.5 group-hover:text-amber-200 group-hover:bg-amber-950/60 border border-transparent group-hover:border-amber-400/80 group-hover:shadow-[0_0_15px_rgba(255,170,0,0.6)] cursor-pointer"
+              >
+                <Icon className="w-4 h-4 transition-transform duration-200 group-hover:scale-110" />
+              </div>
+            </div>
+          );
+
+          if (item.isExternal) {
+            return (
+              <a
+                key={item.id}
+                href={item.href}
+                target="_blank"
+                rel="noreferrer"
+                onClick={sfx?.playClick}
+                onMouseEnter={sfx?.playHover}
+                title={item.label}
+              >
+                {buttonInner}
+              </a>
+            );
+          }
+
+          return (
+            <button
+              key={item.id}
+              onClick={() => {
+                sfx?.playClick?.();
+                item.onClick?.();
+              }}
+              onMouseEnter={sfx?.playHover}
+              title={item.label}
+              className="bg-transparent border-0 p-0 cursor-pointer"
+            >
+              {buttonInner}
+            </button>
+          );
+        })}
+
+        {/* Bottom Indicator */}
+        <div className="w-1 h-3 rounded-full bg-gradient-to-b from-pink-500 to-amber-400 shadow-[0_0_8px_#ffaa00]" />
+      </div>
+    </aside>
+  );
+}
+
+/* =========================================================================
+   8. INTERACTIVE FLOATING TECH DRONE MASCOT (Bottom Right)
+   ========================================================================= */
+export function TechDroneMascot({ sfx, onReboot }) {
+  const [isHovered, setIsHovered] = useState(false);
+
+  return (
+    <div className="fixed bottom-6 right-6 z-40 select-none">
+      <motion.div
+        animate={{ y: [0, -8, 0] }}
+        transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+        onMouseEnter={() => {
+          setIsHovered(true);
+          sfx?.playHover?.();
+        }}
+        onMouseLeave={() => setIsHovered(false)}
+        onClick={() => {
+          sfx?.playPowerUp?.();
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          if (onReboot) onReboot();
+        }}
+        className="relative group cursor-pointer"
+        title="DRONE_AI // CLICK TO REBOOT TO APEX"
+      >
+        {/* Tooltip Tag */}
+        <div
+          className={`absolute bottom-full right-0 mb-3 px-3 py-1.5 rounded-lg bg-[#0a050d]/95 border border-amber-400/60 text-[11px] font-mono text-amber-300 tracking-wider whitespace-nowrap shadow-[0_0_20px_rgba(255,170,0,0.35)] transition-all duration-300 pointer-events-none ${
+            isHovered ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-2 scale-95'
+          }`}
+        >
+          <div className="flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping shadow-[0_0_6px_#ffaa00]" />
+            <span className="font-bold">AI_DRONE // CLICK TO REBOOT TO APEX</span>
+          </div>
+        </div>
+
+        {/* Drone Chassis Container */}
+        <div
+          className={`relative w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-300 ${
+            isHovered
+              ? 'bg-slate-950/95 border-2 border-pink-500 shadow-[0_0_30px_rgba(255,0,85,0.7)] scale-105'
+              : 'bg-[#0a050d]/85 border border-amber-500/40 shadow-[0_0_15px_rgba(255,170,0,0.25)]'
+          }`}
+          style={{
+            clipPath: 'polygon(20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%, 0% 20%)',
+          }}
+        >
+          {/* Animated Internal HUD Radar Grid */}
+          <div
+            className={`absolute inset-1 rounded-xl border border-amber-400/30 transition-all ${
+              isHovered ? 'animate-spin' : ''
+            }`}
+            style={{ animationDuration: '4s' }}
+          />
+
+          {/* Central Optics / Sensor Core */}
+          <div className="relative z-10 flex flex-col items-center justify-center">
+            <Radio
+              className={`w-6 h-6 transition-all duration-300 ${
+                isHovered ? 'text-amber-200 animate-pulse scale-110 drop-shadow-[0_0_8px_#ffaa00]' : 'text-amber-400'
+              }`}
+            />
+          </div>
+
+          {/* Top Status LED */}
+          <div className="absolute top-1 w-1.5 h-1.5 bg-pink-500 rounded-full animate-ping shadow-[0_0_8px_#ff0055]" />
+        </div>
+
+        {/* Dual Neon Blazing Amber/Orange & Magenta Thrusters */}
+        <div className="flex justify-center gap-3.5 -mt-0.5">
+          <div
+            className={`w-2 rounded-full bg-gradient-to-b from-amber-400 via-orange-500 to-pink-600 transition-all duration-200 ${
+              isHovered
+                ? 'h-6 shadow-[0_0_16px_#ffaa00] opacity-100 scale-110'
+                : 'h-3 opacity-65 shadow-[0_0_8px_#ffaa00]'
+            }`}
+          />
+          <div
+            className={`w-2 rounded-full bg-gradient-to-b from-amber-400 via-orange-500 to-pink-600 transition-all duration-200 ${
+              isHovered
+                ? 'h-6 shadow-[0_0_16px_#ffaa00] opacity-100 scale-110'
+                : 'h-3 opacity-65 shadow-[0_0_8px_#ffaa00]'
+            }`}
+          />
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
+/* =========================================================================
    9. MAIN APPLICATION COMPONENT (Ayush Singh Portfolio)
    ========================================================================= */
 export default function App() {
@@ -1622,6 +1814,11 @@ export default function App() {
     setTimeout(() => setToastMessage(null), 3200);
   };
 
+  const handleDroneReboot = () => {
+    setToastMessage('HUD REBOOTED // APEX SECTOR 01 MOUNTED');
+    setTimeout(() => setToastMessage(null), 3200);
+  };
+
   return (
     <div
       className={`relative min-h-screen bg-transparent ${isDark ? 'dark-theme' : 'light-theme'} ${
@@ -1688,173 +1885,203 @@ export default function App() {
       <AtmosphericCanvas isDark={isDark} />
 
       {/* Top-Fixed Neon Scroll Bar */}
-      <div className={`fixed top-0 left-0 w-full h-[2px] z-50 pointer-events-none ${isDark ? 'bg-slate-900/60' : 'bg-slate-200/60'}`}>
+      <div className={`fixed top-0 left-0 w-full h-[2.5px] z-50 pointer-events-none ${isDark ? 'bg-slate-950/80' : 'bg-slate-200/60'}`}>
         <div
-          className="h-full bg-gradient-to-r from-orange-500 via-purple-500 to-cyan-500 shadow-[0_0_12px_#f97316] transition-all duration-75"
+          className="h-full bg-gradient-to-r from-amber-400 via-orange-500 to-pink-500 shadow-[0_0_12px_#ffaa00] transition-all duration-75"
           style={{ width: `${scrollProgress}%` }}
         />
       </div>
 
-      {/* Toast Notification */}
+      {/* Toast Notification (Repositioned to left corner to coexist with Tech Drone) */}
       {toastMessage && (
-        <div className={`fixed bottom-6 right-6 z-50 flex items-center gap-3 px-4 py-3 rounded-xl border text-xs font-mono shadow-xl animate-bounce ${
+        <div className={`fixed bottom-6 left-6 z-50 flex items-center gap-3 px-4 py-3 rounded-xl border text-xs font-mono shadow-xl animate-bounce ${
           isDark
-            ? 'bg-slate-950/90 border-orange-400 text-orange-300 shadow-[0_0_25px_rgba(249,115,22,0.4)]'
-            : 'bg-white border-purple-500 text-purple-700 shadow-purple-500/10'
+            ? 'bg-slate-950/95 border-amber-400 text-amber-300 shadow-[0_0_25px_rgba(255,170,0,0.4)]'
+            : 'bg-white border-pink-500 text-pink-700 shadow-pink-500/10'
         }`}>
-          <Check className="w-4 h-4 text-emerald-500" />
+          <Check className="w-4 h-4 text-emerald-400" />
           <span>{toastMessage}</span>
         </div>
       )}
 
-      {/* Top Navigation Bar with Sleek Theme Toggle Button */}
-      <header className={`sticky top-0 z-40 w-full backdrop-blur-md border-b transition-all duration-300 ${
-        isDark ? 'bg-[#09090b]/85 border-orange-500/20' : 'bg-white/85 border-slate-200/90 shadow-xs'
-      }`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <a
-            href="#hero"
-            onClick={sfx.playClick}
-            onMouseEnter={sfx.playHover}
-            className="flex items-center gap-2 group cursor-pointer"
+      {/* Pinned Vertical Social Ribbon (Right Viewport Edge) */}
+      <SocialRibbon sfx={sfx} onCopyEmail={handleCopyEmail} />
+
+      {/* Interactive Floating Tech Drone Mascot (Bottom Right Corner) */}
+      <TechDroneMascot sfx={sfx} onReboot={handleDroneReboot} />
+
+      {/* =========================================================================
+          ANGULAR GAME HUD NAVIGATION (TOP BAR)
+          ========================================================================= */}
+      <header className="sticky top-0 z-40 w-full px-2 sm:px-6 pt-2 pb-1">
+        <div className="max-w-7xl mx-auto">
+          <div
+            className="hud-clip-nav relative backdrop-blur-xl border-b border-amber-400/30 shadow-[0_4px_30px_rgba(255,170,0,0.18)] transition-all duration-300"
+            style={{
+              backgroundColor: isDark ? 'rgba(10, 5, 13, 0.88)' : 'rgba(255, 255, 255, 0.88)',
+            }}
           >
-            <div className={`w-8 h-8 rounded flex items-center justify-center transition-colors ${
-              isDark
-                ? 'bg-orange-950/80 border border-orange-500/40 text-orange-400 group-hover:border-orange-400 shadow-[0_0_12px_rgba(249,115,22,0.3)]'
-                : 'bg-purple-100 border border-purple-300 text-purple-700 group-hover:border-purple-500 shadow-xs'
-            }`}>
-              <Sparkles className="w-4 h-4" />
-            </div>
-            <div className="flex flex-col">
-              <span className={`font-tech text-base font-bold tracking-wider transition-colors ${
-                isDark ? 'text-white group-hover:text-orange-300' : 'text-slate-900 group-hover:text-purple-600'
-              }`}>
-                AYUSH SINGH
-              </span>
-              <span className={`text-[10px] font-mono tracking-widest ${
-                isDark ? 'text-orange-400/80' : 'text-purple-600'
-              }`}>
-                SRM IST // AI &amp; ML
-              </span>
-            </div>
-          </a>
+            {/* Top amber-to-pink neon edge light accent */}
+            <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-amber-400 to-pink-500 opacity-90 shadow-[0_0_10px_#ffaa00]" />
 
-          <nav className="hidden md:flex items-center gap-6 text-xs font-mono tracking-wider">
-            {[
-              { id: 'projects', label: '01. PROJECTS' },
-              { id: 'case-studies', label: '02. PIPELINE' },
-              { id: 'neural-telemetry', label: '03. DIAGNOSTICS' },
-              { id: 'skills', label: '04. SKILLS' },
-              { id: 'contact', label: '05. CONTACT' }
-            ].map((link) => (
+            <div className="px-4 sm:px-8 h-16 flex items-center justify-between">
+              {/* Brand Logo Callout */}
               <a
-                key={link.id}
-                href={`#${link.id}`}
+                href="#hero"
                 onClick={sfx.playClick}
                 onMouseEnter={sfx.playHover}
-                className={`py-1 transition-all cursor-pointer ${
-                  activeSection === link.id
-                    ? isDark
-                      ? 'text-orange-300 border-b-2 border-orange-400 text-glow-orange font-bold'
-                      : 'text-purple-700 border-b-2 border-purple-600 font-bold'
-                    : isDark
-                    ? 'text-slate-400 hover:text-white'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
+                className="flex items-center gap-2.5 group cursor-pointer"
               >
-                {link.label}
+                <div
+                  className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all ${
+                    isDark
+                      ? 'bg-amber-950/70 border border-amber-500/40 text-amber-400 group-hover:border-pink-400 group-hover:shadow-[0_0_15px_rgba(255,0,85,0.5)]'
+                      : 'bg-amber-100 border border-amber-300 text-amber-700 group-hover:border-amber-500'
+                  }`}
+                >
+                  <Sparkles className="w-4 h-4" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="font-tech text-base font-bold tracking-wider bg-gradient-to-r from-white via-amber-200 to-pink-500 bg-clip-text text-transparent drop-shadow-[0_0_20px_rgba(255,170,0,0.35)] transition-colors">
+                    AYUSH SINGH
+                  </span>
+                  <span className="text-[10px] font-mono tracking-widest text-amber-400/90">
+                    SRM IST // AI &amp; ML
+                  </span>
+                </div>
               </a>
-            ))}
-          </nav>
 
-          <div className="flex items-center gap-2 sm:gap-3">
-            {/* THEME TOGGLE BUTTON IN TOP NAVIGATION BAR */}
-            <button
-              onClick={toggleTheme}
-              onMouseEnter={sfx.playHover}
-              className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 text-xs font-mono rounded-lg transition-all shadow-sm cursor-pointer ${
-                isDark
-                  ? 'bg-slate-900/90 border border-amber-500/40 text-amber-300 hover:border-amber-400 hover:bg-amber-500/10'
-                  : 'bg-white border border-slate-300 text-purple-700 hover:border-purple-400 hover:bg-purple-50 shadow-xs'
-              }`}
-              title={isDark ? 'Switch to Light Theme' : 'Switch to Dark Theme'}
-              aria-label="Toggle Light / Dark Theme"
-            >
-              {isDark ? (
-                <>
-                  <Sun className="w-3.5 h-3.5 text-amber-400 animate-spin" style={{ animationDuration: '24s' }} />
-                  <span className="hidden sm:inline font-bold">LIGHT</span>
-                </>
-              ) : (
-                <>
-                  <Moon className="w-3.5 h-3.5 text-purple-600" />
-                  <span className="hidden sm:inline font-bold">DARK</span>
-                </>
-              )}
-            </button>
+              {/* Navigation Links: [ ACCOMMODATION / ABOUT ] [ PROJECTS ] [ DIAGNOSTICS ] [ SKILLS ] [ CONTACT ] */}
+              <nav className="hidden lg:flex items-center gap-3 xl:gap-5 text-xs font-mono tracking-wider">
+                {[
+                  { id: 'hero', label: 'ACCOMMODATION / ABOUT' },
+                  { id: 'projects', label: 'PROJECTS' },
+                  { id: 'neural-telemetry', label: 'DIAGNOSTICS' },
+                  { id: 'skills', label: 'SKILLS' },
+                  { id: 'contact', label: 'CONTACT' },
+                ].map((link) => {
+                  const isActive = activeSection === link.id;
+                  return (
+                    <a
+                      key={link.id}
+                      href={`#${link.id}`}
+                      onClick={sfx.playClick}
+                      onMouseEnter={sfx.playHover}
+                      className="relative py-2 px-1.5 group cursor-pointer flex flex-col items-center transition-colors"
+                    >
+                      {/* Tiny glowing pip/dot appears above active link */}
+                      <span
+                        className={`w-1.5 h-1.5 rounded-full bg-amber-400 shadow-[0_0_8px_#ffaa00] mb-1 transition-all duration-200 ${
+                          isActive ? 'opacity-100 scale-100 animate-ping' : 'opacity-0 scale-50 group-hover:opacity-80'
+                        }`}
+                      />
 
-            {/* Synthesizer SFX Mute/Unmute */}
-            <button
-              onClick={sfx.toggleSound}
-              onMouseEnter={sfx.playHover}
-              className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 text-xs font-mono rounded-lg border transition-all shadow-sm cursor-pointer ${
-                isDark
-                  ? 'bg-slate-900 border-orange-500/30 hover:border-orange-400 text-slate-300 hover:text-orange-300'
-                  : 'bg-white border-slate-300 hover:border-purple-400 text-slate-700 hover:text-purple-700 shadow-xs'
-              }`}
-              title={sfx.soundEnabled ? 'Disable Synthesizer SFX' : 'Enable Synthesizer SFX'}
-            >
-              {sfx.soundEnabled ? (
-                <>
-                  <Volume2 className={`w-3.5 h-3.5 animate-pulse ${isDark ? 'text-orange-400' : 'text-purple-600'}`} />
-                  <span className={`hidden sm:inline font-semibold ${isDark ? 'text-orange-400' : 'text-purple-600'}`}>SFX [LIVE]</span>
-                </>
-              ) : (
-                <>
-                  <VolumeX className="w-3.5 h-3.5 text-slate-400" />
-                  <span className="hidden sm:inline text-slate-400">SFX [MUTED]</span>
-                </>
-              )}
-            </button>
+                      {/* Text color flashes into glowing amber on hover */}
+                      <span
+                        className={`font-semibold tracking-wider transition-all duration-200 ${
+                          isActive
+                            ? 'text-amber-300 drop-shadow-[0_0_8px_#ffaa00] font-bold'
+                            : 'text-slate-300 group-hover:text-amber-300 group-hover:drop-shadow-[0_0_8px_#ffaa00]'
+                        }`}
+                      >
+                        [ {link.label} ]
+                      </span>
 
-            <MagneticButton>
-              <a
-                href="#projects"
-                onClick={sfx.playClick}
-                onMouseEnter={sfx.playHover}
-                className="px-3.5 py-1.5 text-xs font-mono font-bold rounded-lg bg-gradient-to-r from-orange-500 to-purple-600 text-white shadow-md hover:brightness-110 transition-all whitespace-nowrap cursor-pointer"
-              >
-                SIH 2026
-              </a>
-            </MagneticButton>
+                      {/* Subtle neon underline sweeps in from center in electric amber/pink */}
+                      <span
+                        className={`absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-amber-400 via-orange-400 to-pink-500 transition-transform duration-300 origin-center ${
+                          isActive ? 'scale-x-100 shadow-[0_0_10px_#ff0055]' : 'scale-x-0 group-hover:scale-x-100'
+                        }`}
+                      />
+                    </a>
+                  );
+                })}
+              </nav>
+
+              {/* Controls + Far Right Action: Amber/Pink Gradient Pill Button with High Contrast */}
+              <div className="flex items-center gap-2 sm:gap-3">
+                {/* Theme Toggle Button */}
+                <button
+                  onClick={toggleTheme}
+                  onMouseEnter={sfx.playHover}
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-mono rounded-lg border border-slate-800 hover:border-amber-400/50 bg-slate-950/70 text-slate-300 hover:text-amber-300 transition-all cursor-pointer shadow-sm"
+                  title={isDark ? 'Switch to Light Theme' : 'Switch to Dark Theme'}
+                  aria-label="Toggle Light / Dark Theme"
+                >
+                  {isDark ? (
+                    <>
+                      <Sun className="w-3.5 h-3.5 text-amber-400 animate-spin" style={{ animationDuration: '24s' }} />
+                      <span className="hidden sm:inline font-bold">LIGHT</span>
+                    </>
+                  ) : (
+                    <>
+                      <Moon className="w-3.5 h-3.5 text-pink-500" />
+                      <span className="hidden sm:inline font-bold">DARK</span>
+                    </>
+                  )}
+                </button>
+
+                {/* SFX Mute/Unmute */}
+                <button
+                  onClick={sfx.toggleSound}
+                  onMouseEnter={sfx.playHover}
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-mono rounded-lg border border-slate-800 hover:border-amber-400/50 bg-slate-950/70 text-slate-300 hover:text-amber-300 transition-all cursor-pointer shadow-sm"
+                  title={sfx.soundEnabled ? 'Disable Synthesizer SFX' : 'Enable Synthesizer SFX'}
+                >
+                  {sfx.soundEnabled ? (
+                    <>
+                      <Volume2 className="w-3.5 h-3.5 animate-pulse text-amber-400" />
+                      <span className="hidden sm:inline font-semibold text-amber-400">SFX [LIVE]</span>
+                    </>
+                  ) : (
+                    <>
+                      <VolumeX className="w-3.5 h-3.5 text-slate-400" />
+                      <span className="hidden sm:inline text-slate-400">SFX [MUTED]</span>
+                    </>
+                  )}
+                </button>
+
+                {/* Far Right Action: Amber/Pink Gradient Pill Button with High Contrast Text */}
+                <MagneticButton>
+                  <a
+                    href="#contact"
+                    onClick={sfx.playClick}
+                    onMouseEnter={sfx.playHover}
+                    className="hud-clip-btn px-3.5 sm:px-4 py-1.5 text-xs font-mono font-bold tracking-wider bg-gradient-to-r from-amber-400 via-orange-500 to-pink-600 text-slate-950 hover:brightness-110 shadow-[0_0_20px_rgba(255,170,0,0.45)] hover:shadow-[0_0_30px_rgba(255,0,85,0.7)] transition-all cursor-pointer whitespace-nowrap"
+                  >
+                    [ → SIGN IN / CONTACT ]
+                  </a>
+                </MagneticButton>
+              </div>
+            </div>
           </div>
         </div>
       </header>
 
-      <main className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-32">
+      <main className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-24 sm:space-y-36">
         {/* =========================================================================
             HERO SECTION
             ========================================================================= */}
         <motion.section
           id="hero"
           {...biDirectionalScroll}
-          className="pt-8 sm:pt-16 min-h-[75vh] flex flex-col justify-center overflow-visible"
+          className="snap-section min-h-screen flex flex-col justify-center py-12 sm:py-20 relative overflow-visible"
         >
           <div className="space-y-6">
             <div className="flex flex-wrap items-center gap-2 text-xs font-mono">
               <span className={`px-3 py-1 rounded-full border flex items-center gap-1.5 ${
-                isDark ? 'bg-orange-950/80 border-orange-500/40 text-orange-300' : 'bg-orange-50 border-orange-200 text-orange-800 font-medium'
+                isDark ? 'bg-slate-950/80 border-amber-500/40 text-amber-300 shadow-[0_0_15px_rgba(255,170,0,0.2)]' : 'bg-amber-50 border-amber-200 text-amber-800 font-medium'
               }`}>
-                <span className="w-2 h-2 rounded-full bg-orange-500 animate-ping" />
+                <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
                 SRM INSTITUTE OF SCIENCE AND TECHNOLOGY
               </span>
               <span className={`px-3 py-1 rounded-full border ${
-                isDark ? 'bg-purple-950/80 border-purple-500/40 text-purple-300' : 'bg-purple-50 border-purple-200 text-purple-800 font-medium'
+                isDark ? 'bg-slate-950/80 border-pink-500/40 text-pink-300 shadow-[0_0_15px_rgba(255,0,85,0.2)]' : 'bg-purple-50 border-purple-200 text-purple-800 font-medium'
               }`}>
                 CSE (AI &amp; ML) · SECTION B
               </span>
               <span className={`px-3 py-1 rounded-full border ${
-                isDark ? 'bg-slate-900 border-slate-800 text-slate-400' : 'bg-slate-100 border-slate-200 text-slate-600'
+                isDark ? 'bg-slate-950/80 border-slate-700 text-slate-300' : 'bg-slate-100 border-slate-200 text-slate-600'
               }`}>
                 BATCH 2026 – 2030
               </span>
@@ -1862,21 +2089,19 @@ export default function App() {
 
             <div className="space-y-2">
               <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold font-tech tracking-tight leading-tight">
-                <span className={`inline-block glitch-hover ${isDark ? 'text-white text-glow-orange' : 'text-slate-900'}`}>
+                <span className="inline-block glitch-hover bg-gradient-to-r from-white via-amber-200 to-pink-500 bg-clip-text text-transparent drop-shadow-[0_0_25px_rgba(255,170,0,0.35)]">
                   AYUSH SINGH
                 </span>
               </h1>
-              <p className="text-lg sm:text-2xl font-tech font-semibold tracking-wider bg-gradient-to-r from-orange-500 via-purple-600 to-cyan-500 bg-clip-text text-transparent">
+              <p className="text-lg sm:text-2xl font-tech font-bold tracking-widest text-amber-400 drop-shadow-[0_0_12px_rgba(255,170,0,0.4)]">
                 {portfolioData.tagline}
               </p>
             </div>
 
-            <p className={`max-w-3xl text-sm sm:text-base font-mono leading-relaxed ${
-              isDark ? 'text-slate-300' : 'text-slate-700'
-            }`}>
+            <p className={`max-w-3xl text-sm sm:text-base font-mono leading-relaxed text-zinc-200 [text-shadow:0_1px_8px_rgba(0,0,0,0.85)]`}>
               Engineering statutory risk delay analytics with{' '}
-              <span className={`font-semibold ${isDark ? 'text-orange-300' : 'text-orange-600'}`}>XGBoost &amp; SHAP explainability</span>, and formulating hybrid{' '}
-              <span className={`font-semibold ${isDark ? 'text-purple-400' : 'text-purple-600'}`}>QUBO / QAOA quantum optimization</span> for renewable microgrid
+              <span className={`font-semibold ${isDark ? 'text-amber-300' : 'text-orange-600'}`}>XGBoost &amp; SHAP explainability</span>, and formulating hybrid{' '}
+              <span className={`font-semibold ${isDark ? 'text-pink-400' : 'text-purple-600'}`}>QUBO / QAOA quantum optimization</span> for renewable microgrid
               dispatch. Specialized in high-performance reactive interfaces and explainable machine intelligence.
             </p>
 
@@ -1887,7 +2112,7 @@ export default function App() {
                   href="#projects"
                   onClick={sfx.playClick}
                   onMouseEnter={sfx.playHover}
-                  className="px-6 py-3 rounded-xl bg-gradient-to-r from-orange-500 to-purple-600 hover:brightness-110 text-white font-mono font-bold text-xs shadow-md transition-all flex items-center gap-2 cursor-pointer"
+                  className="px-6 py-3 rounded-xl bg-gradient-to-r from-amber-400 via-orange-500 to-pink-500 hover:brightness-110 text-slate-950 font-mono font-bold text-xs shadow-[0_0_25px_rgba(255,170,0,0.5)] transition-all flex items-center gap-2 cursor-pointer"
                 >
                   <Cpu className="w-4 h-4" />
                   <span>VIEW_SYSTEMS</span>
@@ -1900,12 +2125,12 @@ export default function App() {
                   onMouseEnter={sfx.playHover}
                   className={`px-5 py-3 rounded-xl border font-mono font-semibold text-xs transition-all flex items-center gap-2 cursor-pointer ${
                     isDark
-                      ? 'bg-slate-900/80 hover:bg-slate-800 border-slate-700 hover:border-orange-400 text-slate-200'
+                      ? 'bg-slate-950/70 hover:bg-pink-950/40 border-pink-500/40 hover:border-pink-400 text-pink-200 shadow-[0_0_15px_rgba(255,0,85,0.25)]'
                       : 'bg-white hover:bg-slate-50 border-slate-300 hover:border-purple-400 text-slate-800 shadow-xs'
                   }`}
                   title="Copy Email"
                 >
-                  <Mail className={`w-4 h-4 ${isDark ? 'text-orange-400' : 'text-purple-600'}`} />
+                  <Mail className={`w-4 h-4 ${isDark ? 'text-pink-400' : 'text-purple-600'}`} />
                   <span>090109ayush@gmail.com</span>
                 </button>
               </MagneticButton>
@@ -1919,7 +2144,7 @@ export default function App() {
                   onMouseEnter={sfx.playHover}
                   className={`flex items-center justify-center w-10 h-10 rounded-xl border transition-all duration-200 cursor-pointer ${
                     isDark
-                      ? 'bg-slate-900/80 border-orange-500/30 text-orange-400 hover:border-orange-400 hover:bg-orange-500/10 hover:text-white'
+                      ? 'bg-slate-950/80 border-amber-500/30 text-amber-400 hover:border-amber-400 hover:bg-amber-500/10 hover:text-white hover:shadow-[0_0_15px_rgba(255,170,0,0.4)]'
                       : 'bg-white border-slate-300 text-slate-700 hover:border-purple-400 hover:bg-purple-50 hover:text-purple-700 shadow-xs'
                   }`}
                   title="GitHub: gameszoom325-cell"
@@ -1937,7 +2162,7 @@ export default function App() {
                   onMouseEnter={sfx.playHover}
                   className={`flex items-center justify-center w-10 h-10 rounded-xl border transition-all duration-200 cursor-pointer ${
                     isDark
-                      ? 'bg-slate-900/80 border-orange-500/30 text-orange-400 hover:border-orange-400 hover:bg-orange-500/10 hover:text-white'
+                      ? 'bg-slate-950/80 border-amber-500/30 text-amber-400 hover:border-amber-400 hover:bg-amber-500/10 hover:text-white hover:shadow-[0_0_15px_rgba(255,170,0,0.4)]'
                       : 'bg-white border-slate-300 text-slate-700 hover:border-purple-400 hover:bg-purple-50 hover:text-purple-700 shadow-xs'
                   }`}
                   title="LinkedIn: Ayush Singh"
@@ -1955,7 +2180,7 @@ export default function App() {
                   onMouseEnter={sfx.playHover}
                   className={`flex items-center justify-center w-10 h-10 rounded-xl border transition-all duration-200 cursor-pointer ${
                     isDark
-                      ? 'bg-slate-900/80 border-orange-500/30 text-orange-400 hover:border-orange-400 hover:bg-orange-500/10 hover:text-white'
+                      ? 'bg-slate-950/80 border-pink-500/30 text-pink-400 hover:border-pink-400 hover:bg-pink-500/10 hover:text-white hover:shadow-[0_0_15px_rgba(255,0,85,0.4)]'
                       : 'bg-white border-slate-300 text-slate-700 hover:border-purple-400 hover:bg-purple-50 hover:text-purple-700 shadow-xs'
                   }`}
                   title="Instagram: @ayush.rxt_"
@@ -1980,7 +2205,7 @@ export default function App() {
         <motion.section
           id="projects"
           {...biDirectionalScroll}
-          className="space-y-8 scroll-mt-24"
+          className="snap-section min-h-screen flex flex-col justify-center space-y-8 py-12 sm:py-20 scroll-mt-24"
         >
           <div className={`border-b pb-4 flex flex-col sm:flex-row sm:items-end justify-between gap-4 ${
             isDark ? 'border-orange-500/20' : 'border-slate-200'
@@ -2017,7 +2242,7 @@ export default function App() {
         <motion.section
           id="case-studies"
           {...biDirectionalScroll}
-          className="scroll-mt-24"
+          className="snap-section min-h-screen flex flex-col justify-center py-12 sm:py-20 scroll-mt-24"
         >
           <CaseStudyPipeline sfx={sfx} isDark={isDark} />
         </motion.section>
@@ -2028,7 +2253,7 @@ export default function App() {
         <motion.section
           id="neural-telemetry"
           {...biDirectionalScroll}
-          className="scroll-mt-24"
+          className="snap-section min-h-screen flex flex-col justify-center py-12 sm:py-20 scroll-mt-24"
         >
           <LiveNeuralPipelineDiagnostics sfx={sfx} isDark={isDark} />
         </motion.section>
@@ -2039,7 +2264,7 @@ export default function App() {
         <motion.section
           id="skills"
           {...biDirectionalScroll}
-          className="space-y-8 scroll-mt-24"
+          className="snap-section min-h-screen flex flex-col justify-center space-y-8 py-12 sm:py-20 scroll-mt-24"
         >
           <div className={`border-b pb-4 ${isDark ? 'border-orange-500/20' : 'border-slate-200'}`}>
             <div className={`text-xs font-mono tracking-widest mb-1 ${isDark ? 'text-orange-400' : 'text-orange-600'}`}>
@@ -2059,7 +2284,7 @@ export default function App() {
         <motion.section
           id="contact"
           {...biDirectionalScroll}
-          className="space-y-8 scroll-mt-24"
+          className="snap-section min-h-screen flex flex-col justify-center space-y-8 py-12 sm:py-20 scroll-mt-24"
         >
           <div className={`rounded-2xl p-8 sm:p-12 text-center space-y-6 shadow-xl cyber-corner-tr border transition-all ${
             isDark

@@ -42,16 +42,17 @@ import {
 } from 'lucide-react';
 
 /* =========================================================================
-   REUSABLE BI-DIRECTIONAL SCROLL ANIMATION CONFIGURATION
-   Scroll Down = Reveal, Scroll Up = Exit
+   SCENE-BASED SCROLL TRANSITION CONFIGURATION
+   Full Viewport Snapping / Section Morph
    ========================================================================= */
-const biDirectionalScroll = {
-  viewport: { once: false, amount: 0.25 },
-  initial: { opacity: 0, y: 60, filter: 'blur(6px)' },
-  whileInView: { opacity: 1, y: 0, filter: 'blur(0px)' },
-  exit: { opacity: 0, y: -40, filter: 'blur(4px)' },
-  transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] as const }
+const sceneTransition = {
+  initial: { opacity: 0, y: 80, scale: 1.05, filter: "blur(6px)" },
+  whileInView: { opacity: 1, y: 0, scale: 1, filter: "blur(0px)" },
+  exit: { opacity: 0, y: -60, scale: 0.95, filter: "blur(8px)" },
+  viewport: { once: false, amount: 0.3 },
+  transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] as const }
 };
+const biDirectionalScroll = sceneTransition;
 
 /* =========================================================================
    1. CYBERNETIC SOUND SYNTHESIZER (Web Audio API - Zero External Assets)
@@ -1589,6 +1590,209 @@ export function SkillsTelemetryGrid({
 }
 
 /* =========================================================================
+   7. PINNED VERTICAL SOCIAL RIBBON (Right Edge Dock)
+   ========================================================================= */
+export function SocialRibbon({
+  sfx,
+  onCopyEmail
+}: {
+  sfx: ReturnType<typeof useCyberSound>;
+  onCopyEmail: () => void;
+}) {
+  const socialLinks = [
+    {
+      id: 'github',
+      label: 'GITHUB // AYUSH',
+      icon: Github,
+      href: 'https://github.com/gameszoom325-cell',
+      isExternal: true,
+    },
+    {
+      id: 'linkedin',
+      label: 'LINKEDIN // AYUSH',
+      icon: Linkedin,
+      href: 'https://www.linkedin.com/in/ayush-singh-705a63397?utm_source=share_via&utm_content=profile&utm_medium=member_android',
+      isExternal: true,
+    },
+    {
+      id: 'instagram',
+      label: 'INSTAGRAM // AYUSH',
+      icon: Instagram,
+      href: 'https://www.instagram.com/ayush.rxt_?stkn=aDM1NDE1ZnV1bXBw',
+      isExternal: true,
+    },
+    {
+      id: 'email',
+      label: 'EMAIL // AYUSH',
+      icon: Mail,
+      onClick: onCopyEmail,
+      isExternal: false,
+    },
+  ];
+
+  return (
+    <aside
+      aria-label="Social Channels"
+      className="fixed right-3 sm:right-4 top-1/2 -translate-y-1/2 z-40 flex flex-col pointer-events-auto"
+    >
+      <div className="flex flex-col items-center gap-2.5 py-3.5 px-2 rounded-2xl bg-[#030712]/80 backdrop-blur-md border border-cyan-400/30 shadow-[0_0_25px_rgba(0,0,0,0.6)]">
+        {/* Top Indicator */}
+        <div className="w-1 h-3 rounded-full bg-cyan-400/60 shadow-[0_0_6px_#00f0ff]" />
+
+        {socialLinks.map((item) => {
+          const Icon = item.icon;
+          const buttonInner = (
+            <div className="relative group flex items-center justify-end">
+              {/* Expanding glowing cyan tooltip pill on the left */}
+              <div className="absolute right-full mr-3 px-3 py-1 rounded-full bg-[#030712]/95 border border-cyan-400 text-[10px] font-mono font-bold text-cyan-300 tracking-wider whitespace-nowrap opacity-0 group-hover:opacity-100 translate-x-2 group-hover:translate-x-0 transition-all duration-200 pointer-events-none shadow-[0_0_15px_rgba(0,240,255,0.6)]">
+                {item.label}
+              </div>
+
+              {/* Icon Container: slides 6px left toward center with cyan illumination */}
+              <div
+                className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-300 transition-all duration-200 group-hover:-translate-x-1.5 group-hover:text-cyan-200 group-hover:bg-cyan-950/70 border border-transparent group-hover:border-cyan-400/80 group-hover:shadow-[0_0_15px_rgba(0,240,255,0.6)] cursor-pointer"
+              >
+                <Icon className="w-4 h-4 transition-transform duration-200 group-hover:scale-110" />
+              </div>
+            </div>
+          );
+
+          if (item.isExternal) {
+            return (
+              <a
+                key={item.id}
+                href={item.href}
+                target="_blank"
+                rel="noreferrer"
+                onClick={sfx?.playClick}
+                onMouseEnter={sfx?.playHover}
+                title={item.label}
+              >
+                {buttonInner}
+              </a>
+            );
+          }
+
+          return (
+            <button
+              key={item.id}
+              onClick={() => {
+                sfx?.playClick?.();
+                item.onClick?.();
+              }}
+              onMouseEnter={sfx?.playHover}
+              title={item.label}
+              className="bg-transparent border-0 p-0 cursor-pointer"
+            >
+              {buttonInner}
+            </button>
+          );
+        })}
+
+        {/* Bottom Indicator */}
+        <div className="w-1 h-3 rounded-full bg-cyan-400/60 shadow-[0_0_6px_#00f0ff]" />
+      </div>
+    </aside>
+  );
+}
+
+/* =========================================================================
+   8. INTERACTIVE FLOATING TECH DRONE MASCOT (Bottom Right)
+   ========================================================================= */
+export function TechDroneMascot({
+  sfx,
+  onReboot
+}: {
+  sfx: ReturnType<typeof useCyberSound>;
+  onReboot?: () => void;
+}) {
+  const [isHovered, setIsHovered] = useState(false);
+
+  return (
+    <div className="fixed bottom-6 right-6 z-40 select-none">
+      <motion.div
+        animate={{ y: [0, -8, 0] }}
+        transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+        onMouseEnter={() => {
+          setIsHovered(true);
+          sfx?.playHover?.();
+        }}
+        onMouseLeave={() => setIsHovered(false)}
+        onClick={() => {
+          sfx?.playPowerUp?.();
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          if (onReboot) onReboot();
+        }}
+        className="relative group cursor-pointer"
+        title="DRONE_AI // CLICK TO REBOOT TO APEX"
+      >
+        {/* Tooltip Tag */}
+        <div
+          className={`absolute bottom-full right-0 mb-3 px-3 py-1.5 rounded-lg bg-[#030712]/95 border border-cyan-400/60 text-[11px] font-mono text-cyan-300 tracking-wider whitespace-nowrap shadow-[0_0_20px_rgba(0,240,255,0.45)] transition-all duration-300 pointer-events-none ${
+            isHovered ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-2 scale-95'
+          }`}
+        >
+          <div className="flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping" />
+            <span className="font-bold">AI_DRONE // CLICK TO REBOOT TO APEX</span>
+          </div>
+        </div>
+
+        {/* Drone Chassis Container */}
+        <div
+          className={`relative w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-300 ${
+            isHovered
+              ? 'bg-slate-950/95 border-2 border-cyan-300 shadow-[0_0_30px_rgba(0,240,255,0.85)] scale-105'
+              : 'bg-[#030712]/85 border border-cyan-500/40 shadow-[0_0_15px_rgba(0,240,255,0.3)]'
+          }`}
+          style={{
+            clipPath: 'polygon(20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%, 0% 20%)',
+          }}
+        >
+          {/* Animated Internal HUD Radar Grid */}
+          <div
+            className={`absolute inset-1 rounded-xl border border-cyan-400/30 transition-all ${
+              isHovered ? 'animate-spin' : ''
+            }`}
+            style={{ animationDuration: '4s' }}
+          />
+
+          {/* Central Optics / Sensor Core */}
+          <div className="relative z-10 flex flex-col items-center justify-center">
+            <Radio
+              className={`w-6 h-6 transition-all duration-300 ${
+                isHovered ? 'text-cyan-200 animate-pulse scale-110 drop-shadow-[0_0_8px_#00f0ff]' : 'text-cyan-400'
+              }`}
+            />
+          </div>
+
+          {/* Top Status LED */}
+          <div className="absolute top-1 w-1.5 h-1.5 bg-cyan-400 rounded-full animate-ping shadow-[0_0_6px_#00f0ff]" />
+        </div>
+
+        {/* Dual Neon Cyan Thrusters Flaring at Base */}
+        <div className="flex justify-center gap-3.5 -mt-0.5">
+          <div
+            className={`w-2 rounded-full bg-gradient-to-b from-cyan-400 via-cyan-300 to-transparent transition-all duration-200 ${
+              isHovered
+                ? 'h-6 shadow-[0_0_16px_#00f0ff] opacity-100 scale-110'
+                : 'h-3 opacity-60 shadow-[0_0_8px_#00f0ff]'
+            }`}
+          />
+          <div
+            className={`w-2 rounded-full bg-gradient-to-b from-cyan-400 via-cyan-300 to-transparent transition-all duration-200 ${
+              isHovered
+                ? 'h-6 shadow-[0_0_16px_#00f0ff] opacity-100 scale-110'
+                : 'h-3 opacity-60 shadow-[0_0_8px_#00f0ff]'
+            }`}
+          />
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
+/* =========================================================================
    9. MAIN APPLICATION COMPONENT (Ayush Singh Portfolio)
    ========================================================================= */
 export default function App() {
@@ -1668,6 +1872,11 @@ export default function App() {
     setTimeout(() => setToastMessage(null), 3200);
   };
 
+  const handleDroneReboot = () => {
+    setToastMessage('HUD REBOOTED // APEX SECTOR 01 MOUNTED');
+    setTimeout(() => setToastMessage(null), 3200);
+  };
+
   return (
     <div
       className={`relative min-h-screen bg-transparent ${isDark ? 'dark-theme' : 'light-theme'} ${
@@ -1741,150 +1950,180 @@ export default function App() {
         />
       </div>
 
-      {/* Toast Notification */}
+      {/* Toast Notification (Repositioned to left corner to coexist with Tech Drone) */}
       {toastMessage && (
-        <div className={`fixed bottom-6 right-6 z-50 flex items-center gap-3 px-4 py-3 rounded-xl border text-xs font-mono shadow-xl animate-bounce ${
+        <div className={`fixed bottom-6 left-6 z-50 flex items-center gap-3 px-4 py-3 rounded-xl border text-xs font-mono shadow-xl animate-bounce ${
           isDark
-            ? 'bg-slate-950/90 border-orange-400 text-orange-300 shadow-[0_0_25px_rgba(249,115,22,0.4)]'
+            ? 'bg-slate-950/95 border-cyan-400 text-cyan-300 shadow-[0_0_25px_rgba(0,240,255,0.4)]'
             : 'bg-white border-purple-500 text-purple-700 shadow-purple-500/10'
         }`}>
-          <Check className="w-4 h-4 text-emerald-500" />
+          <Check className="w-4 h-4 text-emerald-400" />
           <span>{toastMessage}</span>
         </div>
       )}
 
-      {/* Top Navigation Bar with Sleek Theme Toggle Button */}
-      <header className={`sticky top-0 z-40 w-full backdrop-blur-md border-b transition-all duration-300 ${
-        isDark ? 'bg-[#09090b]/85 border-orange-500/20' : 'bg-white/85 border-slate-200/90 shadow-xs'
-      }`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <a
-            href="#hero"
-            onClick={sfx.playClick}
-            onMouseEnter={sfx.playHover}
-            className="flex items-center gap-2 group cursor-pointer"
+      {/* Pinned Vertical Social Ribbon (Right Viewport Edge) */}
+      <SocialRibbon sfx={sfx} onCopyEmail={handleCopyEmail} />
+
+      {/* Interactive Floating Tech Drone Mascot (Bottom Right Corner) */}
+      <TechDroneMascot sfx={sfx} onReboot={handleDroneReboot} />
+
+      {/* =========================================================================
+          ANGULAR GAME HUD NAVIGATION (TOP BAR)
+          ========================================================================= */}
+      <header className="sticky top-0 z-40 w-full px-2 sm:px-6 pt-2 pb-1">
+        <div className="max-w-7xl mx-auto">
+          <div
+            className="hud-clip-nav relative backdrop-blur-xl border-b border-cyan-400/50 shadow-[0_4px_30px_rgba(0,240,255,0.18)] transition-all duration-300"
+            style={{
+              backgroundColor: isDark ? 'rgba(3, 7, 18, 0.85)' : 'rgba(255, 255, 255, 0.88)',
+            }}
           >
-            <div className={`w-8 h-8 rounded flex items-center justify-center transition-colors ${
-              isDark
-                ? 'bg-orange-950/80 border border-orange-500/40 text-orange-400 group-hover:border-orange-400 shadow-[0_0_12px_rgba(249,115,22,0.3)]'
-                : 'bg-purple-100 border border-purple-300 text-purple-700 group-hover:border-purple-500 shadow-xs'
-            }`}>
-              <Sparkles className="w-4 h-4" />
-            </div>
-            <div className="flex flex-col">
-              <span className={`font-tech text-base font-bold tracking-wider transition-colors ${
-                isDark ? 'text-white group-hover:text-orange-300' : 'text-slate-900 group-hover:text-purple-600'
-              }`}>
-                AYUSH SINGH
-              </span>
-              <span className={`text-[10px] font-mono tracking-widest ${
-                isDark ? 'text-orange-400/80' : 'text-purple-600'
-              }`}>
-                SRM IST // AI &amp; ML
-              </span>
-            </div>
-          </a>
+            {/* Top cyan neon edge light accent */}
+            <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent opacity-85 shadow-[0_0_8px_#00f0ff]" />
 
-          <nav className="hidden md:flex items-center gap-6 text-xs font-mono tracking-wider">
-            {[
-              { id: 'projects', label: '01. PROJECTS' },
-              { id: 'case-studies', label: '02. PIPELINE' },
-              { id: 'neural-telemetry', label: '03. DIAGNOSTICS' },
-              { id: 'skills', label: '04. SKILLS' },
-              { id: 'contact', label: '05. CONTACT' }
-            ].map((link) => (
+            <div className="px-4 sm:px-8 h-16 flex items-center justify-between">
+              {/* Brand Logo Callout */}
               <a
-                key={link.id}
-                href={`#${link.id}`}
+                href="#hero"
                 onClick={sfx.playClick}
                 onMouseEnter={sfx.playHover}
-                className={`py-1 transition-all cursor-pointer ${
-                  activeSection === link.id
-                    ? isDark
-                      ? 'text-orange-300 border-b-2 border-orange-400 text-glow-orange font-bold'
-                      : 'text-purple-700 border-b-2 border-purple-600 font-bold'
-                    : isDark
-                    ? 'text-slate-400 hover:text-white'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
+                className="flex items-center gap-2.5 group cursor-pointer"
               >
-                {link.label}
+                <div
+                  className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all ${
+                    isDark
+                      ? 'bg-cyan-950/80 border border-cyan-500/40 text-cyan-400 group-hover:border-cyan-300 group-hover:shadow-[0_0_15px_rgba(0,240,255,0.5)]'
+                      : 'bg-cyan-100 border border-cyan-300 text-cyan-700 group-hover:border-cyan-500'
+                  }`}
+                >
+                  <Sparkles className="w-4 h-4" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="font-tech text-base font-bold tracking-wider text-white group-hover:text-cyan-300 text-glow-cyan transition-colors">
+                    AYUSH SINGH
+                  </span>
+                  <span className="text-[10px] font-mono tracking-widest text-cyan-400/80">
+                    SRM IST // AI &amp; ML
+                  </span>
+                </div>
               </a>
-            ))}
-          </nav>
 
-          <div className="flex items-center gap-2 sm:gap-3">
-            {/* THEME TOGGLE BUTTON IN TOP NAVIGATION BAR */}
-            <button
-              onClick={toggleTheme}
-              onMouseEnter={sfx.playHover}
-              className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 text-xs font-mono rounded-lg transition-all shadow-sm cursor-pointer ${
-                isDark
-                  ? 'bg-slate-900/90 border border-amber-500/40 text-amber-300 hover:border-amber-400 hover:bg-amber-500/10'
-                  : 'bg-white border border-slate-300 text-purple-700 hover:border-purple-400 hover:bg-purple-50 shadow-xs'
-              }`}
-              title={isDark ? 'Switch to Light Theme' : 'Switch to Dark Theme'}
-              aria-label="Toggle Light / Dark Theme"
-            >
-              {isDark ? (
-                <>
-                  <Sun className="w-3.5 h-3.5 text-amber-400 animate-spin" style={{ animationDuration: '24s' }} />
-                  <span className="hidden sm:inline font-bold">LIGHT</span>
-                </>
-              ) : (
-                <>
-                  <Moon className="w-3.5 h-3.5 text-purple-600" />
-                  <span className="hidden sm:inline font-bold">DARK</span>
-                </>
-              )}
-            </button>
+              {/* Navigation Links: [ ACCOMMODATION / ABOUT ] [ PROJECTS ] [ DIAGNOSTICS ] [ SKILLS ] [ CONTACT ] */}
+              <nav className="hidden lg:flex items-center gap-3 xl:gap-5 text-xs font-mono tracking-wider">
+                {[
+                  { id: 'hero', label: 'ACCOMMODATION / ABOUT' },
+                  { id: 'projects', label: 'PROJECTS' },
+                  { id: 'neural-telemetry', label: 'DIAGNOSTICS' },
+                  { id: 'skills', label: 'SKILLS' },
+                  { id: 'contact', label: 'CONTACT' },
+                ].map((link) => {
+                  const isActive = activeSection === link.id;
+                  return (
+                    <a
+                      key={link.id}
+                      href={`#${link.id}`}
+                      onClick={sfx.playClick}
+                      onMouseEnter={sfx.playHover}
+                      className="relative py-2 px-1.5 group cursor-pointer flex flex-col items-center transition-colors"
+                    >
+                      {/* Tiny glowing pip/dot appears above active link */}
+                      <span
+                        className={`w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_#00f0ff] mb-1 transition-all duration-200 ${
+                          isActive ? 'opacity-100 scale-100 animate-ping' : 'opacity-0 scale-50 group-hover:opacity-80'
+                        }`}
+                      />
 
-            {/* Synthesizer SFX Mute/Unmute */}
-            <button
-              onClick={sfx.toggleSound}
-              onMouseEnter={sfx.playHover}
-              className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 text-xs font-mono rounded-lg border transition-all shadow-sm cursor-pointer ${
-                isDark
-                  ? 'bg-slate-900 border-orange-500/30 hover:border-orange-400 text-slate-300 hover:text-orange-300'
-                  : 'bg-white border-slate-300 hover:border-purple-400 text-slate-700 hover:text-purple-700 shadow-xs'
-              }`}
-              title={sfx.soundEnabled ? 'Disable Synthesizer SFX' : 'Enable Synthesizer SFX'}
-            >
-              {sfx.soundEnabled ? (
-                <>
-                  <Volume2 className={`w-3.5 h-3.5 animate-pulse ${isDark ? 'text-orange-400' : 'text-purple-600'}`} />
-                  <span className={`hidden sm:inline font-semibold ${isDark ? 'text-orange-400' : 'text-purple-600'}`}>SFX [LIVE]</span>
-                </>
-              ) : (
-                <>
-                  <VolumeX className="w-3.5 h-3.5 text-slate-400" />
-                  <span className="hidden sm:inline text-slate-400">SFX [MUTED]</span>
-                </>
-              )}
-            </button>
+                      {/* Text color flashes into glowing cyan/gold on hover */}
+                      <span
+                        className={`font-semibold tracking-wider transition-all duration-200 ${
+                          isActive
+                            ? 'text-cyan-300 text-glow-cyan font-bold'
+                            : 'text-slate-400 group-hover:text-cyan-300 group-hover:text-glow-cyan'
+                        }`}
+                      >
+                        [ {link.label} ]
+                      </span>
 
-            <MagneticButton>
-              <a
-                href="#projects"
-                onClick={sfx.playClick}
-                onMouseEnter={sfx.playHover}
-                className="px-3.5 py-1.5 text-xs font-mono font-bold rounded-lg bg-gradient-to-r from-orange-500 to-purple-600 text-white shadow-md hover:brightness-110 transition-all whitespace-nowrap cursor-pointer"
-              >
-                SIH 2026
-              </a>
-            </MagneticButton>
+                      {/* Subtle neon underline sweeps in from center */}
+                      <span
+                        className={`absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent transition-transform duration-300 origin-center ${
+                          isActive ? 'scale-x-100 shadow-[0_0_8px_#00f0ff]' : 'scale-x-0 group-hover:scale-x-100'
+                        }`}
+                      />
+                    </a>
+                  );
+                })}
+              </nav>
+
+              {/* Controls + Far Right Action: Angled "[ → SIGN IN / CONTACT ]" button with magnetic glow state */}
+              <div className="flex items-center gap-2 sm:gap-3">
+                {/* Theme Toggle Button */}
+                <button
+                  onClick={toggleTheme}
+                  onMouseEnter={sfx.playHover}
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-mono rounded-lg border border-slate-700 hover:border-cyan-400/50 bg-slate-900/70 text-slate-300 hover:text-cyan-300 transition-all cursor-pointer shadow-sm"
+                  title={isDark ? 'Switch to Light Theme' : 'Switch to Dark Theme'}
+                  aria-label="Toggle Light / Dark Theme"
+                >
+                  {isDark ? (
+                    <>
+                      <Sun className="w-3.5 h-3.5 text-amber-400 animate-spin" style={{ animationDuration: '24s' }} />
+                      <span className="hidden sm:inline font-bold">LIGHT</span>
+                    </>
+                  ) : (
+                    <>
+                      <Moon className="w-3.5 h-3.5 text-cyan-400" />
+                      <span className="hidden sm:inline font-bold">DARK</span>
+                    </>
+                  )}
+                </button>
+
+                {/* SFX Mute/Unmute */}
+                <button
+                  onClick={sfx.toggleSound}
+                  onMouseEnter={sfx.playHover}
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-mono rounded-lg border border-slate-700 hover:border-cyan-400/50 bg-slate-900/70 text-slate-300 hover:text-cyan-300 transition-all cursor-pointer shadow-sm"
+                  title={sfx.soundEnabled ? 'Disable Synthesizer SFX' : 'Enable Synthesizer SFX'}
+                >
+                  {sfx.soundEnabled ? (
+                    <>
+                      <Volume2 className="w-3.5 h-3.5 animate-pulse text-cyan-400" />
+                      <span className="hidden sm:inline font-semibold text-cyan-400">SFX [LIVE]</span>
+                    </>
+                  ) : (
+                    <>
+                      <VolumeX className="w-3.5 h-3.5 text-slate-400" />
+                      <span className="hidden sm:inline text-slate-400">SFX [MUTED]</span>
+                    </>
+                  )}
+                </button>
+
+                {/* Far Right Action: Angled "[ → SIGN IN / CONTACT ]" button with magnetic glow state */}
+                <MagneticButton>
+                  <a
+                    href="#contact"
+                    onClick={sfx.playClick}
+                    onMouseEnter={sfx.playHover}
+                    className="hud-clip-btn px-3 sm:px-4 py-1.5 text-xs font-mono font-bold tracking-wider bg-cyan-950/80 hover:bg-cyan-900/90 text-cyan-300 hover:text-white border border-cyan-400/60 hover:border-cyan-300 shadow-[0_0_15px_rgba(0,240,255,0.35)] hover:shadow-[0_0_25px_rgba(0,240,255,0.7)] transition-all cursor-pointer whitespace-nowrap"
+                  >
+                    [ → SIGN IN / CONTACT ]
+                  </a>
+                </MagneticButton>
+              </div>
+            </div>
           </div>
         </div>
       </header>
 
-      <main className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-32">
+      <main className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-24 sm:space-y-36">
         {/* =========================================================================
             HERO SECTION
             ========================================================================= */}
         <motion.section
           id="hero"
           {...biDirectionalScroll}
-          className="pt-8 sm:pt-16 min-h-[75vh] flex flex-col justify-center overflow-visible"
+          className="snap-section min-h-screen flex flex-col justify-center py-12 sm:py-20 relative overflow-visible"
         >
           <div className="space-y-6">
             <div className="flex flex-wrap items-center gap-2 text-xs font-mono">
@@ -2026,7 +2265,7 @@ export default function App() {
         <motion.section
           id="projects"
           {...biDirectionalScroll}
-          className="space-y-8 scroll-mt-24"
+          className="snap-section min-h-screen flex flex-col justify-center space-y-8 py-12 sm:py-20 scroll-mt-24"
         >
           <div className={`border-b pb-4 flex flex-col sm:flex-row sm:items-end justify-between gap-4 ${
             isDark ? 'border-orange-500/20' : 'border-slate-200'
@@ -2063,7 +2302,7 @@ export default function App() {
         <motion.section
           id="case-studies"
           {...biDirectionalScroll}
-          className="scroll-mt-24"
+          className="snap-section min-h-screen flex flex-col justify-center py-12 sm:py-20 scroll-mt-24"
         >
           <CaseStudyPipeline sfx={sfx} isDark={isDark} />
         </motion.section>
@@ -2074,7 +2313,7 @@ export default function App() {
         <motion.section
           id="neural-telemetry"
           {...biDirectionalScroll}
-          className="scroll-mt-24"
+          className="snap-section min-h-screen flex flex-col justify-center py-12 sm:py-20 scroll-mt-24"
         >
           <LiveNeuralPipelineDiagnostics sfx={sfx} isDark={isDark} />
         </motion.section>
@@ -2085,7 +2324,7 @@ export default function App() {
         <motion.section
           id="skills"
           {...biDirectionalScroll}
-          className="space-y-8 scroll-mt-24"
+          className="snap-section min-h-screen flex flex-col justify-center space-y-8 py-12 sm:py-20 scroll-mt-24"
         >
           <div className={`border-b pb-4 ${isDark ? 'border-orange-500/20' : 'border-slate-200'}`}>
             <div className={`text-xs font-mono tracking-widest mb-1 ${isDark ? 'text-orange-400' : 'text-orange-600'}`}>
@@ -2105,7 +2344,7 @@ export default function App() {
         <motion.section
           id="contact"
           {...biDirectionalScroll}
-          className="space-y-8 scroll-mt-24"
+          className="snap-section min-h-screen flex flex-col justify-center space-y-8 py-12 sm:py-20 scroll-mt-24"
         >
           <div className={`rounded-2xl p-8 sm:p-12 text-center space-y-6 shadow-xl cyber-corner-tr border transition-all ${
             isDark
