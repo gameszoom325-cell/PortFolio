@@ -36,11 +36,13 @@ import {
   CheckCircle2,
   Gauge,
   ArrowRight,
-  Play
+  Play,
+  Sun,
+  Moon
 } from 'lucide-react';
 
 /* =========================================================================
-   REUSABLE BI-DIRECTIONAL SCROLL ANIMATION CONFIGURATION (SPEC 1 & 5)
+   REUSABLE BI-DIRECTIONAL SCROLL ANIMATION CONFIGURATION
    Scroll Down = Reveal, Scroll Up = Exit
    ========================================================================= */
 const biDirectionalScroll = {
@@ -258,7 +260,7 @@ export function MagneticButton({
 
 /* =========================================================================
    3. LIVING ATMOSPHERIC CANVAS PARTICLE NET WITH 2D ELASTIC COLLISION PHYSICS
-   (SPEC 3: Particle-Particle Elastic Collisions + Screen Bounce + Mouse Disperse)
+   Supports dynamic theme adapting (vibrant colors in both Light & Dark modes)
    ========================================================================= */
 interface Particle {
   x: number;
@@ -271,7 +273,7 @@ interface Particle {
   phase: number;
 }
 
-export function AtmosphericCanvas() {
+export function AtmosphericCanvas({ isDark }: { isDark: boolean }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
@@ -285,13 +287,17 @@ export function AtmosphericCanvas() {
     let height = (canvas.height = window.innerHeight);
 
     const isMobile = window.innerWidth < 768;
-    const count = isMobile ? 28 : 72;
+    const count = isMobile ? 26 : 68;
     const maxDistance = isMobile ? 95 : 135;
     const mouseRadius = isMobile ? 0 : 155;
 
     const mouse = { x: -2000, y: -2000, active: false };
     const particles: Particle[] = [];
-    const colors = ['#00f0ff', '#ff007f', '#0066ff', '#38bdf8'];
+
+    // SPEC 3: Bright purple/orange on Dark; subtle deep slate/gray on Light
+    const darkPalette = ['#f97316', '#a855f7', '#fb923c', '#c084fc', '#e11d48'];
+    const lightPalette = ['#334155', '#475569', '#64748b', '#94a3b8', '#7c3aed'];
+    const activePalette = isDark ? darkPalette : lightPalette;
 
     for (let i = 0; i < count; i++) {
       const radius = Math.random() * 2.2 + 1.8;
@@ -301,8 +307,8 @@ export function AtmosphericCanvas() {
         vx: (Math.random() - 0.5) * 0.7,
         vy: (Math.random() - 0.5) * 0.7,
         radius,
-        mass: radius * radius, // Mass proportional to area
-        color: colors[Math.floor(Math.random() * colors.length)],
+        mass: radius * radius,
+        color: activePalette[Math.floor(Math.random() * activePalette.length)],
         phase: Math.random() * Math.PI * 2
       });
     }
@@ -339,7 +345,6 @@ export function AtmosphericCanvas() {
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
 
-        // Cursor Repulsion / Smooth Dispersion (SPEC 3)
         if (mouse.active) {
           const dx = p.x - mouse.x;
           const dy = p.y - mouse.y;
@@ -352,11 +357,9 @@ export function AtmosphericCanvas() {
           }
         }
 
-        // Natural friction/damping to prevent runaway velocities
         p.vx *= 0.992;
         p.vy *= 0.992;
 
-        // Speed clamping
         const speed = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
         const maxSpeed = 3.5;
         if (speed > maxSpeed) {
@@ -367,7 +370,7 @@ export function AtmosphericCanvas() {
         p.x += p.vx;
         p.y += p.vy;
 
-        // 2. BOUNDARY COLLISION PHYSICS (BOUNCE OFF SCREEN EDGES WITH RESTITUTION)
+        // Boundary collision
         if (p.x - p.radius < 0) {
           p.x = p.radius;
           p.vx = Math.abs(p.vx) * 0.95;
@@ -385,7 +388,7 @@ export function AtmosphericCanvas() {
         }
       }
 
-      // 3. ELASTIC 2D PARTICLE-PARTICLE COLLISIONS (SPEC 3)
+      // 2. ELASTIC 2D PARTICLE-PARTICLE COLLISIONS
       for (let i = 0; i < particles.length; i++) {
         for (let j = i + 1; j < particles.length; j++) {
           const p1 = particles[i];
@@ -397,25 +400,18 @@ export function AtmosphericCanvas() {
           const minDist = p1.radius + p2.radius;
 
           if (dist < minDist && dist > 0.001) {
-            // Normal unit vector along collision axis
             const nx = dx / dist;
             const ny = dy / dist;
-
-            // Relative velocity
             const kx = p1.vx - p2.vx;
             const ky = p1.vy - p2.vy;
+            const p = (2 * (nx * kx + ny * ky)) / (p1.mass + p2.mass);
 
-            // Velocity along normal
-            const p = 2 * (nx * kx + ny * ky) / (p1.mass + p2.mass);
-
-            // Collide only if moving toward each other
             if (nx * kx + ny * ky > 0) {
               p1.vx -= p * p2.mass * nx;
               p1.vy -= p * p2.mass * ny;
               p2.vx += p * p1.mass * nx;
               p2.vy += p * p1.mass * ny;
 
-              // Prevent overlap / particle sticking
               const overlap = 0.5 * (minDist - dist);
               p1.x -= overlap * nx;
               p1.y -= overlap * ny;
@@ -426,21 +422,23 @@ export function AtmosphericCanvas() {
         }
       }
 
-      // 4. DRAW CONNECTING NEON EDGES & PARTICLES
+      // 3. DRAW CONNECTING EDGES & GLOWING PARTICLES
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
         const pulse = Math.sin(frame * 0.035 + p.phase) * 0.35 + 1;
 
-        // Particle Core
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.radius * pulse, 0, Math.PI * 2);
         ctx.fillStyle = p.color;
-        ctx.shadowBlur = 8;
-        ctx.shadowColor = p.color;
+        if (isDark) {
+          ctx.shadowBlur = 8;
+          ctx.shadowColor = p.color;
+        } else {
+          ctx.shadowBlur = 0;
+        }
         ctx.fill();
         ctx.shadowBlur = 0;
 
-        // Interconnecting lines
         for (let j = i + 1; j < particles.length; j++) {
           const p2 = particles[j];
           const dx = p.x - p2.x;
@@ -448,12 +446,16 @@ export function AtmosphericCanvas() {
           const dist = Math.sqrt(dx * dx + dy * dy);
 
           if (dist < maxDistance) {
-            const alpha = (1 - dist / maxDistance) * 0.22;
+            const alpha = (1 - dist / maxDistance) * (isDark ? 0.22 : 0.15);
             ctx.beginPath();
             ctx.moveTo(p.x, p.y);
             ctx.lineTo(p2.x, p2.y);
-            ctx.strokeStyle = p.color === '#00f0ff' ? `rgba(0, 240, 255, ${alpha})` : `rgba(255, 0, 127, ${alpha})`;
-            ctx.lineWidth = 0.85;
+            ctx.strokeStyle = isDark
+              ? p.color === '#f97316'
+                ? `rgba(249, 115, 22, ${alpha})`
+                : `rgba(168, 85, 247, ${alpha})`
+              : `rgba(71, 85, 105, ${alpha})`;
+            ctx.lineWidth = isDark ? 0.85 : 0.75;
             ctx.stroke();
           }
         }
@@ -470,12 +472,12 @@ export function AtmosphericCanvas() {
       window.removeEventListener('mousemove', onMouseMove);
       document.removeEventListener('mouseleave', onMouseLeave);
     };
-  }, []);
+  }, [isDark]);
 
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 pointer-events-none z-0 opacity-70"
+      className={`fixed inset-0 pointer-events-none z-0 bg-transparent ${isDark ? 'opacity-70' : 'opacity-85'}`}
     />
   );
 }
@@ -483,7 +485,13 @@ export function AtmosphericCanvas() {
 /* =========================================================================
    4. FIRST-LOAD BOOT SEQUENCE (Obsidian Terminal Decryption Loader)
    ========================================================================= */
-export function BootSequence({ onComplete, sfx }: { onComplete: () => void; sfx: ReturnType<typeof useCyberSound> }) {
+export function BootSequence({
+  onComplete,
+  sfx
+}: {
+  onComplete: () => void;
+  sfx: ReturnType<typeof useCyberSound>;
+}) {
   const [progress, setProgress] = useState(0);
   const [bootLog, setBootLog] = useState<string[]>([]);
   const [isDone, setIsDone] = useState(false);
@@ -544,21 +552,21 @@ export function BootSequence({ onComplete, sfx }: { onComplete: () => void; sfx:
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#02050e] text-slate-100 transition-all duration-700 ${
+      className={`fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#09090b] text-slate-100 transition-all duration-700 ${
         isDone ? '-translate-y-full opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'
       }`}
     >
       <div className="w-full max-w-lg px-6 space-y-6">
-        <div className="flex items-center justify-between border-b border-cyan-500/30 pb-3">
+        <div className="flex items-center justify-between border-b border-orange-500/30 pb-3">
           <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping" />
-            <span className="font-mono text-xs font-bold text-cyan-400 tracking-wider">
+            <span className="w-2.5 h-2.5 rounded-full bg-orange-400 animate-ping" />
+            <span className="font-mono text-xs font-bold text-orange-400 tracking-wider">
               AYUSH_SINGH.EXE // SECURE_BOOT
             </span>
           </div>
           <button
             onClick={handleSkip}
-            className="text-[11px] font-mono text-slate-400 hover:text-cyan-300 border border-slate-800 hover:border-cyan-500/50 px-2 py-0.5 rounded transition-colors cursor-pointer"
+            className="text-[11px] font-mono text-slate-400 hover:text-orange-300 border border-slate-800 hover:border-orange-500/50 px-2 py-0.5 rounded transition-colors cursor-pointer"
           >
             SKIP [ESC]
           </button>
@@ -567,31 +575,31 @@ export function BootSequence({ onComplete, sfx }: { onComplete: () => void; sfx:
         <div className="space-y-2">
           <div className="flex items-baseline justify-between font-mono text-xs">
             <span className="text-slate-400">SYSTEM ARCHITECTURE MOUNT</span>
-            <span className="text-2xl font-bold font-tech text-cyan-300 tabular-nums">
+            <span className="text-2xl font-bold font-tech text-orange-400 tabular-nums">
               {progress}%
             </span>
           </div>
 
-          <div className="h-1.5 w-full bg-slate-900 rounded-full overflow-hidden border border-cyan-500/20">
+          <div className="h-1.5 w-full bg-slate-900 rounded-full overflow-hidden border border-orange-500/20">
             <div
-              className="h-full bg-gradient-to-r from-cyan-500 via-blue-500 to-pink-500 shadow-[0_0_15px_#00f0ff] transition-all duration-100"
+              className="h-full bg-gradient-to-r from-orange-500 via-purple-500 to-cyan-500 shadow-[0_0_15px_#f97316] transition-all duration-100"
               style={{ width: `${progress}%` }}
             />
           </div>
         </div>
 
-        <div className="p-4 rounded-lg bg-slate-950/80 border border-cyan-500/20 font-mono text-[11px] leading-relaxed text-slate-300 min-h-[140px] space-y-1">
+        <div className="p-4 rounded-lg bg-black/60 border border-orange-500/20 font-mono text-[11px] leading-relaxed text-slate-300 min-h-[140px] space-y-1">
           {bootLog.map((log, index) => (
             <div key={index} className="flex items-start gap-2">
-              <span className="text-pink-400">&gt;</span>
-              <span className={index === bootLog.length - 1 ? 'text-cyan-300 font-semibold' : 'text-slate-400'}>
+              <span className="text-purple-400">&gt;</span>
+              <span className={index === bootLog.length - 1 ? 'text-orange-300 font-semibold' : 'text-slate-400'}>
                 {log}
               </span>
             </div>
           ))}
           {progress < 100 && (
-            <div className="flex items-center gap-1 text-cyan-400">
-              <span className="w-2 h-3.5 bg-cyan-400 animate-pulse inline-block" />
+            <div className="flex items-center gap-1 text-orange-400">
+              <span className="w-2 h-3.5 bg-orange-400 animate-pulse inline-block" />
             </div>
           )}
         </div>
@@ -605,16 +613,18 @@ export function BootSequence({ onComplete, sfx }: { onComplete: () => void; sfx:
 }
 
 /* =========================================================================
-   5. 3D HOLOGRAPHIC PROJECT CARD (WITH LIVE DEPLOYMENT LINKS & BI-DIRECTIONAL MOTION)
+   5. 3D HOLOGRAPHIC PROJECT CARD
    ========================================================================= */
 export function HolographicProjectCard({
   project,
   onInspect,
-  sfx
+  sfx,
+  isDark
 }: {
   project: (typeof portfolioData.projects)[0];
   onInspect: () => void;
   sfx: ReturnType<typeof useCyberSound>;
+  isDark: boolean;
 }) {
   const cardRef = useRef<HTMLDivElement | null>(null);
   const [rotate, setRotate] = useState({ x: 0, y: 0 });
@@ -661,31 +671,45 @@ export function HolographicProjectCard({
           transform: `perspective(1000px) rotateX(${rotate.x}deg) rotateY(${rotate.y}deg)`,
           transition: rotate.x === 0 ? 'transform 0.4s ease-out' : 'transform 0.08s ease-out'
         }}
-        className="group relative rounded-xl bg-[#070b18]/90 border border-cyan-500/25 hover:border-cyan-400 p-6 flex flex-col justify-between overflow-hidden transition-colors duration-300 cyber-corner-tr hover:shadow-[0_0_35px_rgba(0,240,255,0.25)] h-full cursor-default"
+        className={`group relative rounded-xl p-6 flex flex-col justify-between overflow-hidden transition-all duration-300 cyber-corner-tr h-full cursor-default ${
+          isDark
+            ? 'bg-[#0f0f13]/90 border border-orange-500/25 hover:border-orange-400 hover:shadow-[0_0_35px_rgba(249,115,22,0.2)] text-[#f3f4f6]'
+            : 'bg-white border border-gray-200 shadow-xl hover:shadow-2xl hover:border-purple-400 text-[#0f172a]'
+        }`}
       >
         <div
           className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"
           style={{
-            background: `radial-gradient(400px circle at ${sheen.x}% ${sheen.y}%, rgba(0, 240, 255, 0.12), transparent 70%)`
+            background: isDark
+              ? `radial-gradient(400px circle at ${sheen.x}% ${sheen.y}%, rgba(249, 115, 22, 0.12), transparent 70%)`
+              : `radial-gradient(400px circle at ${sheen.x}% ${sheen.y}%, rgba(168, 85, 247, 0.08), transparent 70%)`
           }}
         />
 
         <div className="absolute top-0 right-0 w-8 h-8 pointer-events-none">
-          <div className="absolute top-2 right-2 w-2 h-2 bg-cyan-400 rounded-sm group-hover:bg-pink-400 transition-colors" />
+          <div className={`absolute top-2 right-2 w-2 h-2 rounded-sm transition-colors ${
+            isDark ? 'bg-orange-400 group-hover:bg-purple-400' : 'bg-purple-500 group-hover:bg-orange-500'
+          }`} />
         </div>
 
         <div className="relative z-10 space-y-4">
           <div className="flex items-center justify-between text-xs font-mono">
-            <span className="text-cyan-400 font-semibold tracking-wider uppercase">
+            <span className={`font-semibold tracking-wider uppercase ${isDark ? 'text-orange-400' : 'text-orange-600'}`}>
               {project.category}
             </span>
-            <span className="px-2.5 py-0.5 rounded-full bg-pink-950/80 border border-pink-500/40 text-pink-300 text-[11px]">
+            <span className={`px-2.5 py-0.5 rounded-full text-[11px] ${
+              isDark
+                ? 'bg-purple-950/80 border border-purple-500/40 text-purple-300'
+                : 'bg-purple-50 border border-purple-200 text-purple-700 font-medium'
+            }`}>
               {project.badge}
             </span>
           </div>
 
           <div>
-            <h3 className="text-xl font-bold font-tech text-white group-hover:text-cyan-300 transition-colors flex items-center justify-between">
+            <h3 className={`text-xl font-bold font-tech transition-colors flex items-center justify-between ${
+              isDark ? 'text-white group-hover:text-orange-300' : 'text-slate-900 group-hover:text-purple-600'
+            }`}>
               <span>{project.title}</span>
               <button
                 onClick={(e) => {
@@ -693,24 +717,30 @@ export function HolographicProjectCard({
                   sfx.playPowerUp();
                   onInspect();
                 }}
-                className="p-1 rounded hover:bg-slate-800 text-slate-500 hover:text-cyan-400 transition-colors cursor-pointer"
+                className={`p-1 rounded transition-colors cursor-pointer ${
+                  isDark ? 'hover:bg-slate-800 text-slate-500 hover:text-orange-400' : 'hover:bg-slate-100 text-slate-400 hover:text-purple-600'
+                }`}
                 title="Inspect Architecture"
               >
                 <Maximize2 className="w-4 h-4" />
               </button>
             </h3>
-            <p className="mt-2 text-xs sm:text-sm font-mono text-slate-300 leading-relaxed">
+            <p className={`mt-2 text-xs sm:text-sm font-mono leading-relaxed ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
               {project.description}
             </p>
           </div>
 
           {project.stats && project.stats.length > 0 && (
-            <div className="grid grid-cols-2 gap-2 py-2 border-y border-slate-800/80 font-mono text-xs">
+            <div className={`grid grid-cols-2 gap-2 py-2 border-y font-mono text-xs ${
+              isDark ? 'border-slate-800/80' : 'border-slate-200'
+            }`}>
               {project.stats.slice(0, 2).map((s, idx) => (
-                <div key={idx} className="bg-slate-950/60 p-2 rounded border border-slate-800/60">
-                  <div className="text-slate-400 text-[10px]">{s.label}</div>
-                  <div className="text-cyan-300 font-bold tabular-nums">
-                    {s.value} <span className="text-[10px] text-slate-400">{s.unit}</span>
+                <div key={idx} className={`p-2 rounded border ${
+                  isDark ? 'bg-black/40 border-slate-800/80' : 'bg-slate-50 border-slate-200'
+                }`}>
+                  <div className={`text-[10px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{s.label}</div>
+                  <div className={`font-bold tabular-nums ${isDark ? 'text-orange-300' : 'text-purple-700'}`}>
+                    {s.value} <span className="text-[10px] opacity-75">{s.unit}</span>
                   </div>
                 </div>
               ))}
@@ -721,7 +751,11 @@ export function HolographicProjectCard({
             {project.tags.map((tag, idx) => (
               <span
                 key={idx}
-                className="px-2 py-0.5 text-[10px] font-mono rounded bg-slate-900/90 text-slate-300 border border-slate-800 group-hover:border-cyan-500/30 transition-colors"
+                className={`px-2 py-0.5 text-[10px] font-mono rounded border transition-colors ${
+                  isDark
+                    ? 'bg-slate-900/90 text-slate-300 border-slate-800 group-hover:border-orange-500/30'
+                    : 'bg-slate-100 text-slate-700 border-slate-200 group-hover:border-purple-300'
+                }`}
               >
                 #{tag}
               </span>
@@ -729,18 +763,22 @@ export function HolographicProjectCard({
           </div>
         </div>
 
-        {/* Card Action Buttons (Direct Live Links - Spec 4) */}
-        <div className="relative z-10 pt-5 mt-4 border-t border-slate-800/80 flex items-center justify-between gap-3 text-xs font-mono">
+        {/* Card Action Buttons */}
+        <div className={`relative z-10 pt-5 mt-4 border-t flex items-center justify-between gap-3 text-xs font-mono ${
+          isDark ? 'border-slate-800/80' : 'border-gray-200'
+        }`}>
           <button
             onClick={() => {
               sfx.playPowerUp();
               onInspect();
             }}
             onMouseEnter={sfx.playHover}
-            className="flex items-center gap-1.5 text-slate-400 hover:text-cyan-300 transition-colors cursor-pointer"
+            className={`flex items-center gap-1.5 transition-colors cursor-pointer ${
+              isDark ? 'text-slate-400 hover:text-orange-300' : 'text-slate-600 hover:text-purple-600'
+            }`}
           >
             <span>INSPECT SPEC</span>
-            <ChevronRight className="w-3.5 h-3.5 text-cyan-400" />
+            <ChevronRight className={`w-3.5 h-3.5 ${isDark ? 'text-orange-400' : 'text-purple-600'}`} />
           </button>
 
           <div className="flex items-center gap-2">
@@ -753,7 +791,11 @@ export function HolographicProjectCard({
                 sfx.playClick();
               }}
               onMouseEnter={sfx.playHover}
-              className="p-2 rounded-lg bg-slate-900 border border-slate-800 hover:border-cyan-500/50 text-slate-300 hover:text-white transition-colors cursor-pointer"
+              className={`p-2 rounded-lg border transition-colors cursor-pointer ${
+                isDark
+                  ? 'bg-slate-900 border-slate-800 hover:border-orange-500/50 text-slate-300 hover:text-white'
+                  : 'bg-slate-50 border-gray-200 hover:border-purple-400 text-slate-700 hover:text-purple-600 shadow-xs'
+              }`}
               title="View Repository"
             >
               <Github className="w-3.5 h-3.5" />
@@ -768,7 +810,11 @@ export function HolographicProjectCard({
                 sfx.playClick();
               }}
               onMouseEnter={sfx.playHover}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-400/60 hover:border-cyan-400 text-cyan-300 hover:text-cyan-100 font-semibold transition-all shadow-[0_0_12px_rgba(0,240,255,0.2)] cursor-pointer"
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold transition-all shadow-sm cursor-pointer ${
+                isDark
+                  ? 'bg-orange-500/20 hover:bg-orange-500/30 border border-orange-400/60 hover:border-orange-400 text-orange-300 hover:text-orange-100 shadow-[0_0_12px_rgba(249,115,22,0.2)]'
+                  : 'bg-purple-600 hover:bg-purple-700 text-white shadow-md'
+              }`}
             >
               <span>LIVE DEMO</span>
               <ExternalLink className="w-3.5 h-3.5" />
@@ -783,23 +829,39 @@ export function HolographicProjectCard({
 /* =========================================================================
    6. INTERACTIVE CASE STUDY PIPELINE
    ========================================================================= */
-export function CaseStudyPipeline({ sfx }: { sfx: ReturnType<typeof useCyberSound> }) {
+export function CaseStudyPipeline({
+  sfx,
+  isDark
+}: {
+  sfx: ReturnType<typeof useCyberSound>;
+  isDark: boolean;
+}) {
   const [selectedCase, setSelectedCase] = useState(0);
   const [activeStep, setActiveStep] = useState(0);
 
   const activeStudy = portfolioData.caseStudies[selectedCase];
 
   return (
-    <div className="rounded-2xl bg-[#050917]/95 border border-cyan-500/30 p-6 sm:p-8 space-y-8 shadow-[0_0_40px_rgba(0,240,255,0.12)]">
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-4">
+    <div className={`rounded-2xl p-6 sm:p-8 space-y-8 border shadow-lg cyber-corner-tr transition-colors ${
+      isDark
+        ? 'bg-[#0a0a0f]/95 border-orange-500/30 shadow-[0_0_40px_rgba(249,115,22,0.12)] text-slate-100'
+        : 'bg-white border-slate-200 text-slate-900 shadow-xl'
+    }`}>
+      <div className={`flex flex-wrap items-center justify-between gap-4 border-b pb-4 ${
+        isDark ? 'border-slate-800' : 'border-slate-200'
+      }`}>
         <div>
-          <div className="text-xs font-mono text-cyan-400 tracking-widest">// DEEP ARCHITECTURAL BREAKDOWN</div>
-          <h3 className="text-xl sm:text-2xl font-bold font-tech text-white">
+          <div className={`text-xs font-mono tracking-widest ${isDark ? 'text-orange-400' : 'text-orange-600'}`}>
+            // DEEP ARCHITECTURAL BREAKDOWN
+          </div>
+          <h3 className="text-xl sm:text-2xl font-bold font-tech">
             02. Interactive Engineering Pipelines
           </h3>
         </div>
 
-        <div className="flex items-center gap-2 p-1 bg-slate-900/90 border border-slate-800 rounded-lg text-xs font-mono">
+        <div className={`flex items-center gap-2 p-1 rounded-lg text-xs font-mono border ${
+          isDark ? 'bg-slate-900/90 border-slate-800' : 'bg-slate-100 border-slate-200'
+        }`}>
           {portfolioData.caseStudies.map((cs, idx) => (
             <button
               key={cs.id}
@@ -811,8 +873,12 @@ export function CaseStudyPipeline({ sfx }: { sfx: ReturnType<typeof useCyberSoun
               onMouseEnter={sfx.playHover}
               className={`px-3 py-1.5 rounded transition-all cursor-pointer ${
                 selectedCase === idx
-                  ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/50 shadow-sm'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? isDark
+                    ? 'bg-orange-500/20 text-orange-300 border border-orange-500/50 shadow-sm font-semibold'
+                    : 'bg-white text-purple-700 font-bold shadow-xs border border-slate-200'
+                  : isDark
+                  ? 'text-slate-400 hover:text-slate-200'
+                  : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               {cs.title.split(':')[0]}
@@ -822,16 +888,18 @@ export function CaseStudyPipeline({ sfx }: { sfx: ReturnType<typeof useCyberSoun
       </div>
 
       <div className="space-y-2">
-        <div className="flex items-center gap-2 text-xs font-mono text-pink-400">
+        <div className={`flex items-center gap-2 text-xs font-mono ${isDark ? 'text-purple-400' : 'text-purple-600 font-semibold'}`}>
           <Activity className="w-4 h-4" />
           <span>{activeStudy.subtitle}</span>
         </div>
-        <p className="text-xs sm:text-sm font-mono text-slate-300 max-w-3xl leading-relaxed">
+        <p className={`text-xs sm:text-sm font-mono max-w-3xl leading-relaxed ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
           {activeStudy.description}
         </p>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 border-y border-slate-800 py-4">
+      <div className={`grid grid-cols-2 sm:grid-cols-5 gap-2 border-y py-4 ${
+        isDark ? 'border-slate-800' : 'border-slate-200'
+      }`}>
         {activeStudy.steps.map((st, idx) => (
           <button
             key={idx}
@@ -842,12 +910,18 @@ export function CaseStudyPipeline({ sfx }: { sfx: ReturnType<typeof useCyberSoun
             onMouseEnter={sfx.playHover}
             className={`p-3 rounded-lg text-left transition-all font-mono cursor-pointer ${
               activeStep === idx
-                ? 'bg-cyan-950/80 border border-cyan-400/80 shadow-[0_0_15px_rgba(0,240,255,0.25)]'
-                : 'bg-slate-900/60 border border-slate-800/80 hover:border-slate-700'
+                ? isDark
+                  ? 'bg-orange-950/80 border border-orange-400 shadow-[0_0_15px_rgba(249,115,22,0.25)]'
+                  : 'bg-purple-50 border border-purple-500 shadow-sm'
+                : isDark
+                ? 'bg-slate-900/60 border border-slate-800 hover:border-slate-700'
+                : 'bg-slate-50 border border-slate-200 hover:border-slate-300'
             }`}
           >
-            <div className="text-[10px] text-cyan-400/80">PHASE {st.step}</div>
-            <div className="text-xs font-bold font-tech text-white truncate mt-1">
+            <div className={`text-[10px] ${isDark ? 'text-orange-400' : 'text-purple-600 font-semibold'}`}>
+              PHASE {st.step}
+            </div>
+            <div className={`text-xs font-bold font-tech truncate mt-1 ${isDark ? 'text-white' : 'text-slate-900'}`}>
               {st.title}
             </div>
           </button>
@@ -855,30 +929,36 @@ export function CaseStudyPipeline({ sfx }: { sfx: ReturnType<typeof useCyberSoun
       </div>
 
       {activeStudy.steps[activeStep] && (
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center p-6 rounded-xl bg-slate-950/80 border border-cyan-500/20">
+        <div className={`grid grid-cols-1 md:grid-cols-12 gap-6 items-center p-6 rounded-xl border ${
+          isDark ? 'bg-black/50 border-orange-500/20' : 'bg-slate-50 border-slate-200'
+        }`}>
           <div className="md:col-span-8 space-y-3">
             <div className="flex items-center gap-2">
-              <span className="px-2 py-0.5 text-xs font-mono rounded bg-cyan-950 border border-cyan-800 text-cyan-300">
+              <span className={`px-2 py-0.5 text-xs font-mono rounded border ${
+                isDark ? 'bg-orange-950 border-orange-800 text-orange-300' : 'bg-orange-100 border-orange-200 text-orange-800 font-semibold'
+              }`}>
                 STAGE {activeStudy.steps[activeStep].step} // 05
               </span>
-              <h4 className="text-lg font-bold font-tech text-white">
+              <h4 className="text-lg font-bold font-tech">
                 {activeStudy.steps[activeStep].title}
               </h4>
             </div>
-            <p className="text-xs sm:text-sm font-mono text-slate-300 leading-relaxed">
+            <p className={`text-xs sm:text-sm font-mono leading-relaxed ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
               {activeStudy.steps[activeStep].description}
             </p>
           </div>
 
-          <div className="md:col-span-4 p-4 rounded-xl bg-[#030612] border border-pink-500/30 text-center space-y-1">
-            <div className="text-[11px] font-mono text-slate-400">
+          <div className={`md:col-span-4 p-4 rounded-xl border text-center space-y-1 ${
+            isDark ? 'bg-[#050508] border-purple-500/30' : 'bg-white border-purple-200 shadow-sm'
+          }`}>
+            <div className={`text-[11px] font-mono ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
               {activeStudy.steps[activeStep].metricLabel}
             </div>
-            <div className="text-3xl font-bold font-tech text-pink-400 tracking-wide">
+            <div className={`text-3xl font-bold font-tech tracking-wide ${isDark ? 'text-purple-400' : 'text-purple-600'}`}>
               {activeStudy.steps[activeStep].metric}
             </div>
-            <div className="text-[10px] font-mono text-emerald-400 flex items-center justify-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <div className="text-[10px] font-mono text-emerald-600 dark:text-emerald-400 flex items-center justify-center gap-1 font-semibold">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
               BENCHMARK VERIFIED
             </div>
           </div>
@@ -889,17 +969,21 @@ export function CaseStudyPipeline({ sfx }: { sfx: ReturnType<typeof useCyberSoun
 }
 
 /* =========================================================================
-   7. LIVE AI NEURAL PIPELINE & MODEL DIAGNOSTICS CONSOLE (SPEC 2)
-   (Replaces Bloch Sphere with 3 Interactive Project Tabs + Trigger Inference)
+   7. LIVE AI NEURAL PIPELINE & MODEL DIAGNOSTICS CONSOLE
    ========================================================================= */
-export function LiveNeuralPipelineDiagnostics({ sfx }: { sfx: ReturnType<typeof useCyberSound> }) {
+export function LiveNeuralPipelineDiagnostics({
+  sfx,
+  isDark
+}: {
+  sfx: ReturnType<typeof useCyberSound>;
+  isDark: boolean;
+}) {
   const [activeTab, setActiveTab] = useState<'landwatch' | 'farmer' | 'quantum'>('landwatch');
   const [isInferencing, setIsInferencing] = useState(false);
   const [inferenceCycle, setInferenceCycle] = useState(1);
   const [selectedLanguage, setSelectedLanguage] = useState<'en' | 'hi'>('en');
   const [activeQuboCell, setActiveQuboCell] = useState<{ r: number; c: number } | null>(null);
 
-  // Trigger simulated inference recalculation
   const handleTriggerInference = () => {
     sfx.playClick();
     setIsInferencing(true);
@@ -910,7 +994,6 @@ export function LiveNeuralPipelineDiagnostics({ sfx }: { sfx: ReturnType<typeof 
     }, 750);
   };
 
-  // Seeded / dynamically perturbed values for realistic telemetry
   const riskScore = useMemo(() => {
     const base = 78.4;
     const variation = ((inferenceCycle * 17) % 7) - 3;
@@ -921,7 +1004,6 @@ export function LiveNeuralPipelineDiagnostics({ sfx }: { sfx: ReturnType<typeof 
     return (34 + ((inferenceCycle * 13) % 9)).toString();
   }, [inferenceCycle]);
 
-  // SHAP Feature values
   const shapFeatures = [
     { name: 'Statutory Clearance Lag (Sec 11(1))', score: '+0.342', pct: 86, impact: 'High Risk Contributor' },
     { name: 'Gram Sabha Consent Quorum Delay', score: '+0.285', pct: 72, impact: 'Deliberation Block' },
@@ -930,7 +1012,6 @@ export function LiveNeuralPipelineDiagnostics({ sfx }: { sfx: ReturnType<typeof 
     { name: 'Social Impact Assessment (SIA) Incomplete', score: '+0.098', pct: 31, impact: 'Procedural Delay' },
   ];
 
-  // $4 \times 4$ QUBO Coupling Energy Matrix
   const quboMatrix = [
     [-2.40, 1.15, -0.65, 0.42],
     [1.15, -1.85, 0.90, -0.35],
@@ -939,22 +1020,32 @@ export function LiveNeuralPipelineDiagnostics({ sfx }: { sfx: ReturnType<typeof 
   ];
 
   return (
-    <div className="rounded-2xl bg-[#060a18]/95 border border-cyan-500/30 p-6 sm:p-8 space-y-6 shadow-[0_0_40px_rgba(0,240,255,0.15)] cyber-corner-tr">
+    <div className={`rounded-2xl p-6 sm:p-8 space-y-6 border shadow-lg cyber-corner-tr transition-colors ${
+      isDark
+        ? 'bg-[#0a0a0f]/95 border-orange-500/30 shadow-[0_0_40px_rgba(249,115,22,0.15)] text-slate-100'
+        : 'bg-white border-slate-200 shadow-xl text-slate-900'
+    }`}>
       {/* Header and Controls */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-800 pb-5">
+      <div className={`flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b pb-5 ${
+        isDark ? 'border-slate-800' : 'border-slate-200'
+      }`}>
         <div>
-          <div className="text-xs font-mono text-cyan-400 tracking-widest flex items-center gap-2 mb-1">
-            <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
+          <div className={`text-xs font-mono tracking-widest flex items-center gap-2 mb-1 ${
+            isDark ? 'text-orange-400' : 'text-orange-600'
+          }`}>
+            <span className={`w-2 h-2 rounded-full animate-pulse ${isDark ? 'bg-orange-400' : 'bg-orange-500'}`} />
             <span>// COMPUTATIONAL TELEMETRY &amp; LIVE MODEL BENCHMARKS</span>
           </div>
-          <h3 className="text-xl sm:text-2xl font-bold font-tech text-white">
+          <h3 className="text-xl sm:text-2xl font-bold font-tech">
             03. Live AI Neural Pipeline &amp; Model Diagnostics
           </h3>
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
-          <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-950/60 border border-emerald-500/40 text-[11px] font-mono text-emerald-300">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+          <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-mono border ${
+            isDark ? 'bg-emerald-950/60 border-emerald-500/40 text-emerald-300' : 'bg-emerald-50 border-emerald-300 text-emerald-700'
+          }`}>
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
             <span>INFERENCE RUNTIME: ONLINE</span>
           </div>
 
@@ -962,7 +1053,11 @@ export function LiveNeuralPipelineDiagnostics({ sfx }: { sfx: ReturnType<typeof 
             onClick={handleTriggerInference}
             disabled={isInferencing}
             onMouseEnter={sfx.playHover}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 hover:brightness-110 text-slate-950 font-mono font-bold text-xs shadow-[0_0_20px_rgba(0,240,255,0.35)] transition-all cursor-pointer disabled:opacity-50"
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg font-mono font-bold text-xs transition-all cursor-pointer disabled:opacity-50 ${
+              isDark
+                ? 'bg-gradient-to-r from-orange-500 to-purple-600 hover:brightness-110 text-white shadow-[0_0_20px_rgba(249,115,22,0.35)]'
+                : 'bg-purple-600 hover:bg-purple-700 text-white shadow-md'
+            }`}
           >
             <RefreshCw className={`w-3.5 h-3.5 ${isInferencing ? 'animate-spin' : ''}`} />
             <span>{isInferencing ? 'RE-EVALUATING MODEL...' : 'TRIGGER DIAGNOSTICS'}</span>
@@ -970,8 +1065,10 @@ export function LiveNeuralPipelineDiagnostics({ sfx }: { sfx: ReturnType<typeof 
         </div>
       </div>
 
-      {/* Project Selector Tabs (SPEC 2) */}
-      <div className="flex flex-wrap items-center gap-2 border-b border-slate-800/80 pb-4">
+      {/* Project Selector Tabs */}
+      <div className={`flex flex-wrap items-center gap-2 border-b pb-4 ${
+        isDark ? 'border-slate-800/80' : 'border-slate-200'
+      }`}>
         {[
           { id: 'landwatch', label: '1. LandWatch (SIH 2026)', badge: 'XGBoost + SHAP' },
           { id: 'farmer', label: '2. Smart Farmer Portal', badge: 'Dual NLP & OTP Flow' },
@@ -986,42 +1083,55 @@ export function LiveNeuralPipelineDiagnostics({ sfx }: { sfx: ReturnType<typeof 
             onMouseEnter={sfx.playHover}
             className={`px-4 py-2 rounded-lg text-xs font-mono transition-all flex items-center gap-2 cursor-pointer ${
               activeTab === tab.id
-                ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-400 shadow-[0_0_15px_rgba(0,240,255,0.25)] font-bold'
-                : 'bg-slate-900/60 border border-slate-800 text-slate-400 hover:text-slate-200'
+                ? isDark
+                  ? 'bg-orange-500/20 text-orange-300 border border-orange-400 shadow-[0_0_15px_rgba(249,115,22,0.25)] font-bold'
+                  : 'bg-purple-50 text-purple-700 border border-purple-500 shadow-sm font-bold'
+                : isDark
+                ? 'bg-slate-900/60 border border-slate-800 text-slate-400 hover:text-slate-200'
+                : 'bg-slate-100 border border-slate-200 text-slate-600 hover:text-slate-900'
             }`}
           >
             <span>{tab.label}</span>
-            <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-950/80 text-cyan-400 border border-cyan-500/20">
+            <span className={`text-[10px] px-1.5 py-0.5 rounded border ${
+              isDark ? 'bg-black/60 text-orange-400 border-orange-500/20' : 'bg-white text-purple-600 border-slate-200'
+            }`}>
               {tab.badge}
             </span>
           </button>
         ))}
       </div>
 
-      {/* Tab 1: LandWatch (SIH 2026) -> XGBoost + SHAP Explainability Engine */}
+      {/* Tab 1: LandWatch */}
       {activeTab === 'landwatch' && (
         <div className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-            {/* Risk Score Gauge & Invariants */}
-            <div className="lg:col-span-4 p-5 rounded-xl bg-slate-950/80 border border-cyan-500/25 space-y-4">
+            <div className={`lg:col-span-4 p-5 rounded-xl border space-y-4 ${
+              isDark ? 'bg-black/50 border-orange-500/25' : 'bg-slate-50 border-slate-200'
+            }`}>
               <div className="flex items-center justify-between text-xs font-mono">
-                <span className="text-slate-400">PROJECT DELAY PREDICTOR</span>
-                <span className="text-pink-400 font-bold">SIH 2026</span>
+                <span className={isDark ? 'text-slate-400' : 'text-slate-500'}>PROJECT DELAY PREDICTOR</span>
+                <span className={`font-bold ${isDark ? 'text-purple-400' : 'text-purple-600'}`}>SIH 2026</span>
               </div>
 
-              <div className="p-4 rounded-lg bg-[#030614] border border-pink-500/30 text-center space-y-2">
-                <div className="text-[11px] font-mono text-slate-400">PREDICTED BEYOND-SCHEDULE RISK</div>
-                <div className="text-4xl font-bold font-tech text-pink-400 tracking-tight">
+              <div className={`p-4 rounded-lg border text-center space-y-2 ${
+                isDark ? 'bg-[#050508] border-purple-500/30' : 'bg-white border-purple-200 shadow-sm'
+              }`}>
+                <div className={`text-[11px] font-mono ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>PREDICTED BEYOND-SCHEDULE RISK</div>
+                <div className={`text-4xl font-bold font-tech tracking-tight ${isDark ? 'text-purple-400' : 'text-purple-600'}`}>
                   {riskScore}%
                 </div>
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-pink-950/80 border border-pink-500/40 text-[10px] font-mono text-pink-300">
-                  <AlertTriangle className="w-3 h-3 text-pink-400" />
+                <div className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono border ${
+                  isDark ? 'bg-purple-950/80 border-purple-500/40 text-purple-300' : 'bg-purple-50 border-purple-200 text-purple-700'
+                }`}>
+                  <AlertTriangle className="w-3 h-3 text-purple-500" />
                   <span>CRITICAL STATUTORY DELAY LIKELY</span>
                 </div>
               </div>
 
               <div className="space-y-2 pt-2 text-xs font-mono">
-                <div className="text-slate-400 text-[11px] uppercase tracking-wider">// STATUTORY INVARIANTS</div>
+                <div className={`text-[11px] uppercase tracking-wider ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                  // STATUTORY INVARIANTS
+                </div>
                 <div className="space-y-1.5">
                   {[
                     { label: 'RFCTLARR Sec 19 Notification', status: 'IN REVIEW', ok: false },
@@ -1029,9 +1139,11 @@ export function LiveNeuralPipelineDiagnostics({ sfx }: { sfx: ReturnType<typeof 
                     { label: 'GIS Environmental Overlap', status: '0 VIOLATIONS', ok: true },
                     { label: 'Gram Sabha Quorum Status', status: 'UNRESOLVED', ok: false },
                   ].map((inv, idx) => (
-                    <div key={idx} className="flex items-center justify-between p-2 rounded bg-slate-900/60 border border-slate-800">
-                      <span className="text-slate-300 text-[11px]">{inv.label}</span>
-                      <span className={`text-[10px] font-bold ${inv.ok ? 'text-emerald-400' : 'text-amber-400'}`}>
+                    <div key={idx} className={`flex items-center justify-between p-2 rounded border ${
+                      isDark ? 'bg-slate-900/60 border-slate-800' : 'bg-white border-slate-200'
+                    }`}>
+                      <span className={`text-[11px] ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>{inv.label}</span>
+                      <span className={`text-[10px] font-bold ${inv.ok ? 'text-emerald-500' : 'text-amber-500'}`}>
                         {inv.status}
                       </span>
                     </div>
@@ -1039,20 +1151,29 @@ export function LiveNeuralPipelineDiagnostics({ sfx }: { sfx: ReturnType<typeof 
                 </div>
               </div>
 
-              <div className="pt-2 flex items-center justify-between text-[11px] font-mono text-slate-400 border-t border-slate-800">
+              <div className={`pt-2 flex items-center justify-between text-[11px] font-mono border-t ${
+                isDark ? 'border-slate-800 text-slate-400' : 'border-slate-200 text-slate-500'
+              }`}>
                 <span>Inference Latency:</span>
-                <span className="text-cyan-300 font-bold">{latencyXGB} ms (Batch 512)</span>
+                <span className={`font-bold ${isDark ? 'text-orange-300' : 'text-orange-600'}`}>{latencyXGB} ms (Batch 512)</span>
               </div>
             </div>
 
-            {/* SHAP Feature Importance Telemetry */}
-            <div className="lg:col-span-8 p-5 rounded-xl bg-slate-950/80 border border-cyan-500/25 space-y-4">
+            <div className={`lg:col-span-8 p-5 rounded-xl border space-y-4 ${
+              isDark ? 'bg-black/50 border-orange-500/25' : 'bg-slate-50 border-slate-200'
+            }`}>
               <div className="flex items-center justify-between text-xs font-mono">
                 <div>
-                  <span className="text-cyan-400 font-bold">XGBOOST ENSEMBLE + GAME-THEORETIC SHAP ATTRIBUTION</span>
-                  <p className="text-[11px] text-slate-400">Mathematical marginal contributions to total project timeline deviation</p>
+                  <span className={`font-bold ${isDark ? 'text-orange-400' : 'text-orange-600'}`}>
+                    XGBOOST ENSEMBLE + GAME-THEORETIC SHAP ATTRIBUTION
+                  </span>
+                  <p className={`text-[11px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                    Mathematical marginal contributions to total project timeline deviation
+                  </p>
                 </div>
-                <span className="px-2 py-0.5 rounded bg-cyan-950 border border-cyan-800 text-[10px] text-cyan-300">
+                <span className={`px-2 py-0.5 rounded border text-[10px] ${
+                  isDark ? 'bg-orange-950 border-orange-800 text-orange-300' : 'bg-orange-100 border-orange-200 text-orange-800 font-semibold'
+                }`}>
                   AUC: 0.942
                 </span>
               </div>
@@ -1061,17 +1182,19 @@ export function LiveNeuralPipelineDiagnostics({ sfx }: { sfx: ReturnType<typeof 
                 {shapFeatures.map((f, idx) => (
                   <div key={idx} className="space-y-1">
                     <div className="flex items-center justify-between text-xs font-mono">
-                      <span className="text-slate-200 font-medium truncate max-w-[280px] sm:max-w-none">
+                      <span className={`font-medium truncate max-w-[280px] sm:max-w-none ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
                         {f.name}
                       </span>
                       <div className="flex items-center gap-3">
-                        <span className="text-slate-400 text-[11px] hidden sm:inline">{f.impact}</span>
-                        <span className="text-cyan-300 font-bold font-mono">{f.score} SHAP</span>
+                        <span className={`text-[11px] hidden sm:inline ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{f.impact}</span>
+                        <span className={`font-bold font-mono ${isDark ? 'text-orange-300' : 'text-purple-600'}`}>{f.score} SHAP</span>
                       </div>
                     </div>
-                    <div className="h-2 w-full bg-slate-900 rounded-full overflow-hidden border border-slate-800">
+                    <div className={`h-2 w-full rounded-full overflow-hidden border ${
+                      isDark ? 'bg-slate-900 border-slate-800' : 'bg-slate-200 border-slate-300'
+                    }`}>
                       <motion.div
-                        className="h-full bg-gradient-to-r from-cyan-500 to-pink-500 rounded-full"
+                        className="h-full bg-gradient-to-r from-orange-500 to-purple-500 rounded-full"
                         initial={{ width: 0 }}
                         animate={{ width: `${f.pct}%` }}
                         transition={{ duration: 0.8, delay: idx * 0.08 }}
@@ -1081,10 +1204,12 @@ export function LiveNeuralPipelineDiagnostics({ sfx }: { sfx: ReturnType<typeof 
                 ))}
               </div>
 
-              <div className="p-3 rounded-lg bg-slate-900/70 border border-slate-800 text-[11px] font-mono text-slate-300 flex items-start gap-2">
-                <CheckCircle2 className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
+              <div className={`p-3 rounded-lg border text-[11px] font-mono flex items-start gap-2 ${
+                isDark ? 'bg-slate-900/70 border-slate-800 text-slate-300' : 'bg-white border-slate-200 text-slate-700'
+              }`}>
+                <CheckCircle2 className={`w-4 h-4 shrink-0 mt-0.5 ${isDark ? 'text-orange-400' : 'text-purple-600'}`} />
                 <span>
-                  <strong className="text-cyan-300">SIH 2026 Auditability Guaranteed:</strong> All predictions output rigorous mathematical attribution vectors preventing municipal administrative discretion disputes.
+                  <strong className={isDark ? 'text-orange-300' : 'text-purple-700'}>SIH 2026 Auditability Guaranteed:</strong> All predictions output rigorous mathematical attribution vectors preventing municipal administrative discretion disputes.
                 </span>
               </div>
             </div>
@@ -1092,24 +1217,30 @@ export function LiveNeuralPipelineDiagnostics({ sfx }: { sfx: ReturnType<typeof 
         </div>
       )}
 
-      {/* Tab 2: Smart Farmer Portal -> Interactive API & OTP Routing Flow */}
+      {/* Tab 2: Smart Farmer Portal */}
       {activeTab === 'farmer' && (
         <div className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-            {/* Routing Topology Visualizer */}
-            <div className="lg:col-span-8 p-5 rounded-xl bg-slate-950/80 border border-cyan-500/25 space-y-5">
+            <div className={`lg:col-span-8 p-5 rounded-xl border space-y-5 ${
+              isDark ? 'bg-black/50 border-orange-500/25' : 'bg-slate-50 border-slate-200'
+            }`}>
               <div className="flex items-center justify-between text-xs font-mono">
                 <div>
-                  <span className="text-cyan-400 font-bold">PROGRESSIVE AGRI-GATEWAY &amp; CARRIER OTP PIPELINE</span>
-                  <p className="text-[11px] text-slate-400">Multi-lingual rural edge network with sub-50ms SMS routing and offline indexing</p>
+                  <span className={`font-bold ${isDark ? 'text-orange-400' : 'text-orange-600'}`}>
+                    PROGRESSIVE AGRI-GATEWAY &amp; CARRIER OTP PIPELINE
+                  </span>
+                  <p className={`text-[11px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                    Multi-lingual rural edge network with sub-50ms SMS routing and offline indexing
+                  </p>
                 </div>
-                <div className="flex items-center gap-1.5 text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-950 border border-emerald-600 text-emerald-300">
-                  <Wifi className="w-3 h-3 text-emerald-400" />
+                <div className={`flex items-center gap-1.5 text-[10px] font-mono px-2 py-0.5 rounded border ${
+                  isDark ? 'bg-emerald-950 border-emerald-600 text-emerald-300' : 'bg-emerald-100 border-emerald-300 text-emerald-800'
+                }`}>
+                  <Wifi className="w-3 h-3 text-emerald-500" />
                   <span>SLA 99.8% PING</span>
                 </div>
               </div>
 
-              {/* Node Routing Flow */}
               <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 font-mono text-xs">
                 {[
                   { step: '01', title: 'Farmer Query', desc: 'SMS / USSD / Web Hook', icon: Globe, ping: '4ms' },
@@ -1121,34 +1252,49 @@ export function LiveNeuralPipelineDiagnostics({ sfx }: { sfx: ReturnType<typeof 
                   return (
                     <div
                       key={idx}
-                      className="p-3.5 rounded-lg bg-[#040816] border border-cyan-500/20 hover:border-cyan-400 transition-colors space-y-1.5 relative group"
+                      className={`p-3.5 rounded-lg border transition-colors space-y-1.5 ${
+                        isDark
+                          ? 'bg-[#05050a] border-orange-500/20 hover:border-orange-400'
+                          : 'bg-white border-slate-200 hover:border-purple-400 shadow-xs'
+                      }`}
                     >
                       <div className="flex items-center justify-between text-[10px]">
-                        <span className="text-pink-400 font-bold">NODE {node.step}</span>
-                        <span className="text-emerald-400">{node.ping}</span>
+                        <span className={`font-bold ${isDark ? 'text-purple-400' : 'text-purple-600'}`}>NODE {node.step}</span>
+                        <span className="text-emerald-500">{node.ping}</span>
                       </div>
-                      <div className="flex items-center gap-1.5 text-white font-tech font-bold text-sm">
-                        <Icon className="w-3.5 h-3.5 text-cyan-400" />
+                      <div className={`flex items-center gap-1.5 font-tech font-bold text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                        <Icon className={`w-3.5 h-3.5 ${isDark ? 'text-orange-400' : 'text-orange-600'}`} />
                         <span>{node.title}</span>
                       </div>
-                      <div className="text-[11px] text-slate-400">{node.desc}</div>
+                      <div className={`text-[11px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{node.desc}</div>
                     </div>
                   );
                 })}
               </div>
 
-              {/* Live Interactive Localization Simulator */}
-              <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800 space-y-3">
+              <div className={`p-4 rounded-xl border space-y-3 ${
+                isDark ? 'bg-slate-900/60 border-slate-800' : 'bg-white border-slate-200 shadow-xs'
+              }`}>
                 <div className="flex items-center justify-between text-xs font-mono">
-                  <span className="text-slate-300 font-semibold">TEST LOCALIZATION NLP ROUTING (LIVE PAYLOAD):</span>
-                  <div className="flex items-center gap-1 bg-slate-950 p-1 rounded border border-slate-800">
+                  <span className={`font-semibold ${isDark ? 'text-slate-300' : 'text-slate-800'}`}>
+                    TEST LOCALIZATION NLP ROUTING (LIVE PAYLOAD):
+                  </span>
+                  <div className={`flex items-center gap-1 p-1 rounded border ${
+                    isDark ? 'bg-black border-slate-800' : 'bg-slate-100 border-slate-200'
+                  }`}>
                     <button
                       onClick={() => {
                         sfx.playClick();
                         setSelectedLanguage('en');
                       }}
                       className={`px-2 py-0.5 rounded text-[10px] cursor-pointer ${
-                        selectedLanguage === 'en' ? 'bg-cyan-500/30 text-cyan-300 font-bold' : 'text-slate-400'
+                        selectedLanguage === 'en'
+                          ? isDark
+                            ? 'bg-orange-500/30 text-orange-300 font-bold'
+                            : 'bg-white text-purple-700 font-bold shadow-xs'
+                          : isDark
+                          ? 'text-slate-400'
+                          : 'text-slate-600'
                       }`}
                     >
                       ENGLISH
@@ -1159,7 +1305,13 @@ export function LiveNeuralPipelineDiagnostics({ sfx }: { sfx: ReturnType<typeof 
                         setSelectedLanguage('hi');
                       }}
                       className={`px-2 py-0.5 rounded text-[10px] cursor-pointer ${
-                        selectedLanguage === 'hi' ? 'bg-cyan-500/30 text-cyan-300 font-bold' : 'text-slate-400'
+                        selectedLanguage === 'hi'
+                          ? isDark
+                            ? 'bg-orange-500/30 text-orange-300 font-bold'
+                            : 'bg-white text-purple-700 font-bold shadow-xs'
+                          : isDark
+                          ? 'text-slate-400'
+                          : 'text-slate-600'
                       }`}
                     >
                       हिंदी (HINDI)
@@ -1167,15 +1319,17 @@ export function LiveNeuralPipelineDiagnostics({ sfx }: { sfx: ReturnType<typeof 
                   </div>
                 </div>
 
-                <div className="p-3 rounded bg-slate-950 border border-cyan-500/20 font-mono text-xs text-slate-200">
+                <div className={`p-3 rounded border font-mono text-xs ${
+                  isDark ? 'bg-black border-orange-500/20 text-slate-200' : 'bg-slate-50 border-slate-200 text-slate-800'
+                }`}>
                   {selectedLanguage === 'en' ? (
                     <div>
-                      <div className="text-[10px] text-cyan-400 mb-1">// INPUT STREAM [EN-US]:</div>
+                      <div className={`text-[10px] mb-1 ${isDark ? 'text-orange-400' : 'text-orange-600'}`}>// INPUT STREAM [EN-US]:</div>
                       &quot;Soil nitrogen deficit detected in Sector 4. Recommend DAP fertilizer application at 45kg/acre prior to irrigation.&quot;
                     </div>
                   ) : (
                     <div>
-                      <div className="text-[10px] text-pink-400 mb-1">// इनपुट स्ट्रीम [HI-IN] (TRANSLATED 18ms):</div>
+                      <div className={`text-[10px] mb-1 ${isDark ? 'text-purple-400' : 'text-purple-600'}`}>// इनपुट स्ट्रीम [HI-IN] (TRANSLATED 18ms):</div>
                       &quot;सेक्टर 4 में मिट्टी में नाइट्रोजन की कमी पाई गई। सिंचाई से पहले 45 किग्रा/एकड़ की दर से डीएपी उर्वरक डालने की सलाह दी जाती है।&quot;
                     </div>
                   )}
@@ -1183,9 +1337,10 @@ export function LiveNeuralPipelineDiagnostics({ sfx }: { sfx: ReturnType<typeof 
               </div>
             </div>
 
-            {/* Performance SLA Metrics */}
-            <div className="lg:col-span-4 p-5 rounded-xl bg-slate-950/80 border border-cyan-500/25 space-y-4 font-mono">
-              <div className="text-xs text-slate-400">TELEMETRY BENCHMARKS</div>
+            <div className={`lg:col-span-4 p-5 rounded-xl border space-y-4 font-mono ${
+              isDark ? 'bg-black/50 border-orange-500/25' : 'bg-slate-50 border-slate-200'
+            }`}>
+              <div className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>TELEMETRY BENCHMARKS</div>
 
               <div className="space-y-3">
                 {[
@@ -1194,10 +1349,12 @@ export function LiveNeuralPipelineDiagnostics({ sfx }: { sfx: ReturnType<typeof 
                   { label: 'Advisory Offline Cache', value: '<86 ms', detail: 'IndexedDB PWA storage' },
                   { label: 'Low-Bandwidth Optimization', value: '4.2 KB', detail: 'Gzip compressed payload' },
                 ].map((item, idx) => (
-                  <div key={idx} className="p-3 rounded-lg bg-slate-900/60 border border-slate-800 space-y-0.5">
-                    <div className="text-[11px] text-slate-400">{item.label}</div>
-                    <div className="text-xl font-bold font-tech text-cyan-300">{item.value}</div>
-                    <div className="text-[10px] text-slate-500">{item.detail}</div>
+                  <div key={idx} className={`p-3 rounded-lg border space-y-0.5 ${
+                    isDark ? 'bg-slate-900/60 border-slate-800' : 'bg-white border-slate-200 shadow-xs'
+                  }`}>
+                    <div className={`text-[11px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{item.label}</div>
+                    <div className={`text-xl font-bold font-tech ${isDark ? 'text-orange-300' : 'text-purple-700'}`}>{item.value}</div>
+                    <div className={`text-[10px] ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>{item.detail}</div>
                   </div>
                 ))}
               </div>
@@ -1206,38 +1363,46 @@ export function LiveNeuralPipelineDiagnostics({ sfx }: { sfx: ReturnType<typeof 
         </div>
       )}
 
-      {/* Tab 3: Quantum Grid Optimizer -> QUBO / QAOA Matrix Readout */}
+      {/* Tab 3: Quantum Grid Optimizer */}
       {activeTab === 'quantum' && (
         <div className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-            {/* $4 \times 4$ QUBO Coupling Energy Matrix */}
-            <div className="lg:col-span-7 p-5 rounded-xl bg-slate-950/80 border border-cyan-500/25 space-y-4 font-mono">
+            <div className={`lg:col-span-7 p-5 rounded-xl border space-y-4 font-mono ${
+              isDark ? 'bg-black/50 border-orange-500/25' : 'bg-slate-50 border-slate-200'
+            }`}>
               <div className="flex items-center justify-between text-xs">
                 <div>
-                  <span className="text-cyan-400 font-bold">QUADRATIC UNCONSTRAINED BINARY OPTIMIZATION (QUBO)</span>
-                  <p className="text-[11px] text-slate-400">Pairwise Ising spin coupling matrix Q_ij for renewable microgrid dispatch</p>
+                  <span className={`font-bold ${isDark ? 'text-orange-400' : 'text-orange-600'}`}>
+                    QUADRATIC UNCONSTRAINED BINARY OPTIMIZATION (QUBO)
+                  </span>
+                  <p className={`text-[11px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                    Pairwise Ising spin coupling matrix Q_ij for renewable microgrid dispatch
+                  </p>
                 </div>
-                <span className="px-2 py-0.5 rounded bg-pink-950 border border-pink-700 text-[10px] text-pink-300">
+                <span className={`px-2 py-0.5 rounded border text-[10px] ${
+                  isDark ? 'bg-purple-950 border-purple-700 text-purple-300' : 'bg-purple-100 border-purple-200 text-purple-800'
+                }`}>
                   24 QUBITS SIMULATED
                 </span>
               </div>
 
-              {/* Matrix Grid */}
-              <div className="p-4 rounded-xl bg-[#030612] border border-cyan-500/20 overflow-x-auto">
+              <div className={`p-4 rounded-xl border overflow-x-auto ${
+                isDark ? 'bg-[#030308] border-orange-500/20' : 'bg-white border-slate-200 shadow-xs'
+              }`}>
                 <table className="w-full text-center border-collapse">
                   <thead>
-                    <tr className="text-[10px] text-slate-500 border-b border-slate-800">
+                    <tr className={`text-[10px] border-b ${isDark ? 'text-slate-500 border-slate-800' : 'text-slate-400 border-slate-200'}`}>
                       <th className="p-2">Q_ij</th>
-                      <th className="p-2 text-cyan-300">Node q0</th>
-                      <th className="p-2 text-cyan-300">Node q1</th>
-                      <th className="p-2 text-cyan-300">Node q2</th>
-                      <th className="p-2 text-cyan-300">Node q3</th>
+                      <th className={`p-2 ${isDark ? 'text-orange-300' : 'text-orange-600 font-bold'}`}>Node q0</th>
+                      <th className={`p-2 ${isDark ? 'text-orange-300' : 'text-orange-600 font-bold'}`}>Node q1</th>
+                      <th className={`p-2 ${isDark ? 'text-orange-300' : 'text-orange-600 font-bold'}`}>Node q2</th>
+                      <th className={`p-2 ${isDark ? 'text-orange-300' : 'text-orange-600 font-bold'}`}>Node q3</th>
                     </tr>
                   </thead>
                   <tbody>
                     {quboMatrix.map((row, rIdx) => (
-                      <tr key={rIdx} className="border-b border-slate-900/80">
-                        <td className="p-2 text-[10px] font-bold text-slate-500">q{rIdx}</td>
+                      <tr key={rIdx} className={`border-b ${isDark ? 'border-slate-900/80' : 'border-slate-100'}`}>
+                        <td className={`p-2 text-[10px] font-bold ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>q{rIdx}</td>
                         {row.map((val, cIdx) => {
                           const isSelected = activeQuboCell?.r === rIdx && activeQuboCell?.c === cIdx;
                           const isNegative = val < 0;
@@ -1250,10 +1415,12 @@ export function LiveNeuralPipelineDiagnostics({ sfx }: { sfx: ReturnType<typeof 
                               }}
                               className={`p-2 text-xs transition-colors cursor-pointer rounded ${
                                 isSelected
-                                  ? 'bg-cyan-500/30 text-white font-bold border border-cyan-400'
+                                  ? isDark
+                                    ? 'bg-orange-500/30 text-white font-bold border border-orange-400'
+                                    : 'bg-purple-100 text-purple-900 font-bold border border-purple-400'
                                   : isNegative
-                                  ? 'text-cyan-300 hover:bg-slate-900'
-                                  : 'text-pink-400 hover:bg-slate-900'
+                                  ? isDark ? 'text-orange-300 hover:bg-slate-900' : 'text-orange-600 font-semibold hover:bg-slate-100'
+                                  : isDark ? 'text-purple-400 hover:bg-slate-900' : 'text-purple-700 font-semibold hover:bg-slate-100'
                               }`}
                               title={`Coupling q${rIdx}-q${cIdx}: ${val}`}
                             >
@@ -1267,45 +1434,54 @@ export function LiveNeuralPipelineDiagnostics({ sfx }: { sfx: ReturnType<typeof 
                 </table>
               </div>
 
-              <div className="text-[11px] text-slate-400 flex items-center justify-between">
-                <span>Color coding: <span className="text-cyan-400 font-bold">Negative (Ferromagnetic)</span> vs <span className="text-pink-400 font-bold">Positive (Anti-ferromagnetic)</span></span>
-                <span className="text-emerald-400 font-bold">Ising Ground Verified</span>
+              <div className={`text-[11px] flex items-center justify-between ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                <span>Coupling polarity: <span className="text-orange-500 font-bold">Negative</span> vs <span className="text-purple-600 font-bold">Positive</span></span>
+                <span className="text-emerald-500 font-bold">Ising Ground Verified</span>
               </div>
             </div>
 
-            {/* QAOA Convergence & Hamiltonian State */}
-            <div className="lg:col-span-5 p-5 rounded-xl bg-slate-950/80 border border-cyan-500/25 space-y-4 font-mono text-xs">
-              <div className="text-slate-400">QAOA / COBYLA SOLVER TELEMETRY</div>
+            <div className={`lg:col-span-5 p-5 rounded-xl border space-y-4 font-mono text-xs ${
+              isDark ? 'bg-black/50 border-orange-500/25' : 'bg-slate-50 border-slate-200'
+            }`}>
+              <div className={isDark ? 'text-slate-400' : 'text-slate-500'}>QAOA / COBYLA SOLVER TELEMETRY</div>
 
               <div className="space-y-3">
-                <div className="p-3 rounded-lg bg-[#030612] border border-cyan-500/30 space-y-1">
-                  <div className="text-[10px] text-slate-400">CONVERGENCE RATE</div>
-                  <div className="text-3xl font-bold font-tech text-emerald-400">
+                <div className={`p-3 rounded-lg border space-y-1 ${
+                  isDark ? 'bg-[#030308] border-orange-500/30' : 'bg-white border-purple-200 shadow-xs'
+                }`}>
+                  <div className={`text-[10px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>CONVERGENCE RATE</div>
+                  <div className="text-3xl font-bold font-tech text-emerald-500">
                     100.0%
                   </div>
-                  <div className="text-[10px] text-emerald-300 flex items-center gap-1">
-                    <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                  <div className="text-[10px] text-emerald-600 dark:text-emerald-400 flex items-center gap-1 font-semibold">
+                    <CheckCircle2 className="w-3 h-3 text-emerald-500" />
                     <span>Global Minimum Invariant Satisfied</span>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-2">
-                  <div className="p-2.5 rounded bg-slate-900/60 border border-slate-800">
-                    <div className="text-[10px] text-slate-500">GROUND ENERGY</div>
-                    <div className="text-base font-bold text-pink-400 font-tech">-42.85 eV</div>
+                  <div className={`p-2.5 rounded border ${
+                    isDark ? 'bg-slate-900/60 border-slate-800' : 'bg-white border-slate-200 shadow-xs'
+                  }`}>
+                    <div className={`text-[10px] ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>GROUND ENERGY</div>
+                    <div className={`text-base font-bold font-tech ${isDark ? 'text-purple-400' : 'text-purple-700'}`}>-42.85 eV</div>
                   </div>
-                  <div className="p-2.5 rounded bg-slate-900/60 border border-slate-800">
-                    <div className="text-[10px] text-slate-500">COBYLA CYCLES</div>
-                    <div className="text-base font-bold text-cyan-300 font-tech">120 Cycles</div>
+                  <div className={`p-2.5 rounded border ${
+                    isDark ? 'bg-slate-900/60 border-slate-800' : 'bg-white border-slate-200 shadow-xs'
+                  }`}>
+                    <div className={`text-[10px] ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>COBYLA CYCLES</div>
+                    <div className={`text-base font-bold font-tech ${isDark ? 'text-orange-300' : 'text-orange-600'}`}>120 Cycles</div>
                   </div>
                 </div>
 
-                <div className="p-3 rounded-lg bg-slate-900/60 border border-slate-800 space-y-1">
-                  <div className="text-[10px] text-slate-400">OPTIMAL STATE VECTOR</div>
-                  <div className="text-sm font-tech font-bold text-white tracking-widest">
-                    |q₀ q₁ q₂ q₃⟩ = <span className="text-cyan-300">|1 0 1 1⟩</span>
+                <div className={`p-3 rounded-lg border space-y-1 ${
+                  isDark ? 'bg-slate-900/60 border-slate-800' : 'bg-white border-slate-200 shadow-xs'
+                }`}>
+                  <div className={`text-[10px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>OPTIMAL STATE VECTOR</div>
+                  <div className="text-sm font-tech font-bold tracking-widest">
+                    |q₀ q₁ q₂ q₃⟩ = <span className={isDark ? 'text-orange-300' : 'text-purple-700'}>|1 0 1 1⟩</span>
                   </div>
-                  <div className="text-[10px] text-slate-500">
+                  <div className={`text-[10px] ${isDark ? 'text-slate-500' : 'text-slate-500'}`}>
                     Battery storage charge prioritized · Peak grid loss mitigated by 18.4%
                   </div>
                 </div>
@@ -1319,9 +1495,15 @@ export function LiveNeuralPipelineDiagnostics({ sfx }: { sfx: ReturnType<typeof 
 }
 
 /* =========================================================================
-   8. SKILLS & TECHNICAL CAPABILITIES GRID (WITH BI-DIRECTIONAL MOTION)
+   8. SKILLS & TECHNICAL CAPABILITIES GRID
    ========================================================================= */
-export function SkillsTelemetryGrid({ sfx }: { sfx: ReturnType<typeof useCyberSound> }) {
+export function SkillsTelemetryGrid({
+  sfx,
+  isDark
+}: {
+  sfx: ReturnType<typeof useCyberSound>;
+  isDark: boolean;
+}) {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [hoveredSkill, setHoveredSkill] = useState<string | null>(null);
 
@@ -1334,7 +1516,9 @@ export function SkillsTelemetryGrid({ sfx }: { sfx: ReturnType<typeof useCyberSo
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center gap-2 border-b border-slate-800 pb-4">
+      <div className={`flex flex-wrap items-center gap-2 border-b pb-4 ${
+        isDark ? 'border-slate-800' : 'border-slate-200'
+      }`}>
         {categories.map((cat) => (
           <button
             key={cat}
@@ -1345,8 +1529,12 @@ export function SkillsTelemetryGrid({ sfx }: { sfx: ReturnType<typeof useCyberSo
             onMouseEnter={sfx.playHover}
             className={`px-3.5 py-1.5 text-xs font-mono rounded-lg transition-all cursor-pointer ${
               selectedCategory === cat
-                ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-400/80 shadow-[0_0_12px_rgba(0,240,255,0.2)]'
-                : 'bg-slate-900/60 border border-slate-800 text-slate-400 hover:text-slate-200'
+                ? isDark
+                  ? 'bg-orange-500/20 text-orange-300 border border-orange-400 shadow-[0_0_12px_rgba(249,115,22,0.2)] font-bold'
+                  : 'bg-purple-50 text-purple-700 border border-purple-500 shadow-sm font-bold'
+                : isDark
+                ? 'bg-slate-900/60 border border-slate-800 text-slate-400 hover:text-slate-200'
+                : 'bg-slate-100 border border-slate-200 text-slate-600 hover:text-slate-900'
             }`}
           >
             {cat}
@@ -1364,27 +1552,33 @@ export function SkillsTelemetryGrid({ sfx }: { sfx: ReturnType<typeof useCyberSo
               setHoveredSkill(skill.name);
             }}
             onMouseLeave={() => setHoveredSkill(null)}
-            className={`p-4 rounded-xl bg-slate-950/70 border transition-all duration-200 cursor-default ${
+            className={`p-4 rounded-xl border transition-all duration-200 cursor-default ${
               hoveredSkill === skill.name
-                ? 'border-cyan-400 bg-slate-900/90 shadow-[0_0_20px_rgba(0,240,255,0.2)]'
-                : 'border-slate-800 hover:border-slate-700'
+                ? isDark
+                  ? 'border-orange-400 bg-slate-900/90 shadow-[0_0_20px_rgba(249,115,22,0.2)]'
+                  : 'border-purple-500 bg-white shadow-lg'
+                : isDark
+                ? 'border-slate-800 bg-[#0c0c11]/80 hover:border-slate-700'
+                : 'border-slate-200 bg-white shadow-xs hover:border-slate-300'
             }`}
           >
             <div className="flex items-center justify-between text-xs font-mono mb-2">
-              <span className="font-bold text-white font-tech text-sm tracking-wide">
+              <span className={`font-bold font-tech text-sm tracking-wide ${isDark ? 'text-white' : 'text-slate-900'}`}>
                 {skill.name}
               </span>
-              <span className="text-cyan-300 font-semibold">{skill.level}%</span>
+              <span className={`font-semibold ${isDark ? 'text-orange-300' : 'text-purple-600'}`}>{skill.level}%</span>
             </div>
 
-            <div className="h-1.5 w-full bg-slate-900 rounded-full overflow-hidden mb-3 border border-slate-800">
+            <div className={`h-1.5 w-full rounded-full overflow-hidden mb-3 border ${
+              isDark ? 'bg-slate-900 border-slate-800' : 'bg-slate-100 border-slate-200'
+            }`}>
               <div
-                className="h-full bg-gradient-to-r from-cyan-500 to-blue-500 transition-all duration-500"
+                className="h-full bg-gradient-to-r from-orange-500 to-purple-500 transition-all duration-500"
                 style={{ width: `${skill.level}%` }}
               />
             </div>
 
-            <div className="text-[11px] font-mono text-slate-400 line-clamp-2">
+            <div className={`text-[11px] font-mono line-clamp-2 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
               {skill.highlight}
             </div>
           </motion.div>
@@ -1404,6 +1598,43 @@ export default function App() {
   const [activeSection, setActiveSection] = useState('hero');
   const [scrollProgress, setScrollProgress] = useState(0);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.play().catch(() => {
+        // Autoplay may be deferred until user interaction by browser security policy
+      });
+    }
+  }, []);
+
+  // High-End Theme State with LocalStorage Persistence
+  const [theme, setTheme] = useState<'dark' | 'light'>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('portfolio-theme');
+      if (saved === 'light' || saved === 'dark') return saved;
+      if (window.matchMedia('(prefers-color-scheme: light)').matches) return 'light';
+    }
+    return 'dark';
+  });
+
+  const isDark = theme === 'dark';
+
+  useEffect(() => {
+    if (theme === 'light') {
+      document.documentElement.classList.add('light-theme', 'light');
+      document.documentElement.classList.remove('dark-theme', 'dark');
+    } else {
+      document.documentElement.classList.add('dark-theme', 'dark');
+      document.documentElement.classList.remove('light-theme', 'light');
+    }
+    localStorage.setItem('portfolio-theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    sfx.playPowerUp();
+    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
+  };
 
   // Monitor Scroll Progress & Active Section
   useEffect(() => {
@@ -1438,40 +1669,94 @@ export default function App() {
   };
 
   return (
-    <div className="relative min-h-screen bg-[#030712] text-slate-100 cyber-grid-pattern aurora-mesh overflow-x-hidden selection:bg-cyan-500/30 selection:text-cyan-200">
-      {/* 1. First-Load Boot Sequence */}
-      {!bootDone && (
-        <BootSequence
-          onComplete={() => setBootDone(true)}
-          sfx={sfx}
+    <div
+      className={`relative min-h-screen bg-transparent ${isDark ? 'dark-theme' : 'light-theme'} ${
+        isDark ? 'text-slate-100 selection:bg-orange-500/30 selection:text-orange-200' : 'text-slate-900 selection:bg-purple-500/20 selection:text-purple-900'
+      } overflow-x-hidden`}
+      style={{
+        background: 'transparent',
+        backgroundColor: 'transparent',
+      }}
+    >
+      {/* =========================================================================
+          BACKGROUND ARCHITECTURE
+          ========================================================================= */}
+      {/* 1. Exact Video Mounting: Skyscraper billboard video from Cloudinary */}
+      <video
+        ref={videoRef}
+        autoPlay
+        loop
+        muted
+        playsInline
+        preload="auto"
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: "100vw",
+          height: "100vh",
+          objectFit: "cover",
+          zIndex: -30,
+          pointerEvents: "none",
+        }}
+        onError={(e) => {
+          console.warn('[Video Engine] Background video loading failed:', e);
+        }}
+      >
+        <source
+          src="https://res.cloudinary.com/lnalzoz5/video/upload/v1790941245/cyberpunk-bg.mp4"
+          type="video/mp4"
         />
-      )}
+      </video>
 
-      {/* 2. Top-Fixed Neon Scroll Bar */}
-      <div className="fixed top-0 left-0 w-full h-[2px] z-50 bg-slate-900 pointer-events-none">
+      {/* 2. Readability Tint: Translucent overlay so text, HUD panels, and metrics stay readable */}
+      <div
+        className="fixed inset-0 pointer-events-none transition-colors duration-300"
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: "100vw",
+          height: "100vh",
+          zIndex: -20,
+          backgroundColor: isDark ? "rgba(3, 7, 18, 0.5)" : "rgba(255, 255, 255, 0.5)",
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* 3. CSS Grid Overlay with low opacity and no solid background behind grid lines */}
+      <div className="fixed inset-0 -z-10 pointer-events-none cyber-grid-pattern opacity-15" />
+
+      {/* 4. Subtle CRT Scanline Overlay */}
+      <div className="fixed inset-0 -z-10 pointer-events-none crt-scanlines opacity-10" />
+
+      {/* 5. Living Atmospheric Canvas Particle Web (bg-transparent, clearRect only) */}
+      <AtmosphericCanvas isDark={isDark} />
+
+      {/* Top-Fixed Neon Scroll Bar */}
+      <div className={`fixed top-0 left-0 w-full h-[2px] z-50 pointer-events-none ${isDark ? 'bg-slate-900/60' : 'bg-slate-200/60'}`}>
         <div
-          className="h-full bg-gradient-to-r from-cyan-400 via-blue-500 to-pink-500 shadow-[0_0_12px_#00f0ff] transition-all duration-75"
+          className="h-full bg-gradient-to-r from-orange-500 via-purple-500 to-cyan-500 shadow-[0_0_12px_#f97316] transition-all duration-75"
           style={{ width: `${scrollProgress}%` }}
         />
       </div>
 
-      {/* 3. Subtle CRT Scanline & Radial Vignette Overlay (SPEC 4) */}
-      <div className="fixed inset-0 pointer-events-none z-30 crt-scanlines" />
-      <div className="fixed inset-0 pointer-events-none z-30 crt-vignette" />
-
-      {/* 4. Canvas Particle Net with 2D Elastic Collision Physics (SPEC 3) */}
-      <AtmosphericCanvas />
-
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-4 py-3 rounded-xl bg-slate-950/90 border border-cyan-400 text-cyan-300 text-xs font-mono shadow-[0_0_25px_rgba(0,240,255,0.4)] animate-bounce">
-          <Check className="w-4 h-4 text-emerald-400" />
+        <div className={`fixed bottom-6 right-6 z-50 flex items-center gap-3 px-4 py-3 rounded-xl border text-xs font-mono shadow-xl animate-bounce ${
+          isDark
+            ? 'bg-slate-950/90 border-orange-400 text-orange-300 shadow-[0_0_25px_rgba(249,115,22,0.4)]'
+            : 'bg-white border-purple-500 text-purple-700 shadow-purple-500/10'
+        }`}>
+          <Check className="w-4 h-4 text-emerald-500" />
           <span>{toastMessage}</span>
         </div>
       )}
 
-      {/* Responsive HUD Navigation Bar */}
-      <header className="sticky top-0 z-40 w-full backdrop-blur-md bg-slate-950/80 border-b border-cyan-500/20 transition-all">
+      {/* Top Navigation Bar with Sleek Theme Toggle Button */}
+      <header className={`sticky top-0 z-40 w-full backdrop-blur-md border-b transition-all duration-300 ${
+        isDark ? 'bg-[#09090b]/85 border-orange-500/20' : 'bg-white/85 border-slate-200/90 shadow-xs'
+      }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <a
             href="#hero"
@@ -1479,14 +1764,22 @@ export default function App() {
             onMouseEnter={sfx.playHover}
             className="flex items-center gap-2 group cursor-pointer"
           >
-            <div className="w-8 h-8 rounded bg-cyan-950/80 border border-cyan-500/40 flex items-center justify-center text-cyan-400 group-hover:border-cyan-400 shadow-[0_0_12px_rgba(0,240,255,0.3)] transition-colors">
+            <div className={`w-8 h-8 rounded flex items-center justify-center transition-colors ${
+              isDark
+                ? 'bg-orange-950/80 border border-orange-500/40 text-orange-400 group-hover:border-orange-400 shadow-[0_0_12px_rgba(249,115,22,0.3)]'
+                : 'bg-purple-100 border border-purple-300 text-purple-700 group-hover:border-purple-500 shadow-xs'
+            }`}>
               <Sparkles className="w-4 h-4" />
             </div>
             <div className="flex flex-col">
-              <span className="font-tech text-base font-bold tracking-wider text-white group-hover:text-cyan-300 transition-colors">
+              <span className={`font-tech text-base font-bold tracking-wider transition-colors ${
+                isDark ? 'text-white group-hover:text-orange-300' : 'text-slate-900 group-hover:text-purple-600'
+              }`}>
                 AYUSH SINGH
               </span>
-              <span className="text-[10px] font-mono text-cyan-400/80 tracking-widest">
+              <span className={`text-[10px] font-mono tracking-widest ${
+                isDark ? 'text-orange-400/80' : 'text-purple-600'
+              }`}>
                 SRM IST // AI &amp; ML
               </span>
             </div>
@@ -1507,8 +1800,12 @@ export default function App() {
                 onMouseEnter={sfx.playHover}
                 className={`py-1 transition-all cursor-pointer ${
                   activeSection === link.id
-                    ? 'text-cyan-300 border-b-2 border-cyan-400 text-glow-cyan'
-                    : 'text-slate-400 hover:text-white'
+                    ? isDark
+                      ? 'text-orange-300 border-b-2 border-orange-400 text-glow-orange font-bold'
+                      : 'text-purple-700 border-b-2 border-purple-600 font-bold'
+                    : isDark
+                    ? 'text-slate-400 hover:text-white'
+                    : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 {link.label}
@@ -1516,22 +1813,52 @@ export default function App() {
             ))}
           </nav>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* THEME TOGGLE BUTTON IN TOP NAVIGATION BAR */}
+            <button
+              onClick={toggleTheme}
+              onMouseEnter={sfx.playHover}
+              className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 text-xs font-mono rounded-lg transition-all shadow-sm cursor-pointer ${
+                isDark
+                  ? 'bg-slate-900/90 border border-amber-500/40 text-amber-300 hover:border-amber-400 hover:bg-amber-500/10'
+                  : 'bg-white border border-slate-300 text-purple-700 hover:border-purple-400 hover:bg-purple-50 shadow-xs'
+              }`}
+              title={isDark ? 'Switch to Light Theme' : 'Switch to Dark Theme'}
+              aria-label="Toggle Light / Dark Theme"
+            >
+              {isDark ? (
+                <>
+                  <Sun className="w-3.5 h-3.5 text-amber-400 animate-spin" style={{ animationDuration: '24s' }} />
+                  <span className="hidden sm:inline font-bold">LIGHT</span>
+                </>
+              ) : (
+                <>
+                  <Moon className="w-3.5 h-3.5 text-purple-600" />
+                  <span className="hidden sm:inline font-bold">DARK</span>
+                </>
+              )}
+            </button>
+
+            {/* Synthesizer SFX Mute/Unmute */}
             <button
               onClick={sfx.toggleSound}
               onMouseEnter={sfx.playHover}
-              className="flex items-center gap-2 px-3 py-1.5 text-xs font-mono rounded-lg bg-slate-900 border border-cyan-500/30 hover:border-cyan-400 text-slate-300 hover:text-cyan-300 transition-all shadow-sm cursor-pointer"
+              className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 text-xs font-mono rounded-lg border transition-all shadow-sm cursor-pointer ${
+                isDark
+                  ? 'bg-slate-900 border-orange-500/30 hover:border-orange-400 text-slate-300 hover:text-orange-300'
+                  : 'bg-white border-slate-300 hover:border-purple-400 text-slate-700 hover:text-purple-700 shadow-xs'
+              }`}
               title={sfx.soundEnabled ? 'Disable Synthesizer SFX' : 'Enable Synthesizer SFX'}
             >
               {sfx.soundEnabled ? (
                 <>
-                  <Volume2 className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
-                  <span className="hidden sm:inline text-cyan-400 font-semibold">SFX [LIVE]</span>
+                  <Volume2 className={`w-3.5 h-3.5 animate-pulse ${isDark ? 'text-orange-400' : 'text-purple-600'}`} />
+                  <span className={`hidden sm:inline font-semibold ${isDark ? 'text-orange-400' : 'text-purple-600'}`}>SFX [LIVE]</span>
                 </>
               ) : (
                 <>
-                  <VolumeX className="w-3.5 h-3.5 text-slate-500" />
-                  <span className="hidden sm:inline text-slate-500">SFX [MUTED]</span>
+                  <VolumeX className="w-3.5 h-3.5 text-slate-400" />
+                  <span className="hidden sm:inline text-slate-400">SFX [MUTED]</span>
                 </>
               )}
             </button>
@@ -1541,7 +1868,7 @@ export default function App() {
                 href="#projects"
                 onClick={sfx.playClick}
                 onMouseEnter={sfx.playHover}
-                className="px-3.5 py-1.5 text-xs font-mono font-bold rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 text-slate-950 shadow-[0_0_15px_rgba(0,240,255,0.4)] hover:brightness-110 transition-all whitespace-nowrap cursor-pointer"
+                className="px-3.5 py-1.5 text-xs font-mono font-bold rounded-lg bg-gradient-to-r from-orange-500 to-purple-600 text-white shadow-md hover:brightness-110 transition-all whitespace-nowrap cursor-pointer"
               >
                 SIH 2026
               </a>
@@ -1552,7 +1879,7 @@ export default function App() {
 
       <main className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-32">
         {/* =========================================================================
-            HERO SECTION (BI-DIRECTIONAL MOTION REVEAL - SPEC 1 & 5)
+            HERO SECTION
             ========================================================================= */}
         <motion.section
           id="hero"
@@ -1561,44 +1888,52 @@ export default function App() {
         >
           <div className="space-y-6">
             <div className="flex flex-wrap items-center gap-2 text-xs font-mono">
-              <span className="px-3 py-1 rounded-full bg-cyan-950/80 border border-cyan-500/40 text-cyan-300 flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
+              <span className={`px-3 py-1 rounded-full border flex items-center gap-1.5 ${
+                isDark ? 'bg-orange-950/80 border-orange-500/40 text-orange-300' : 'bg-orange-50 border-orange-200 text-orange-800 font-medium'
+              }`}>
+                <span className="w-2 h-2 rounded-full bg-orange-500 animate-ping" />
                 SRM INSTITUTE OF SCIENCE AND TECHNOLOGY
               </span>
-              <span className="px-3 py-1 rounded-full bg-purple-950/80 border border-purple-500/40 text-purple-300">
+              <span className={`px-3 py-1 rounded-full border ${
+                isDark ? 'bg-purple-950/80 border-purple-500/40 text-purple-300' : 'bg-purple-50 border-purple-200 text-purple-800 font-medium'
+              }`}>
                 CSE (AI &amp; ML) · SECTION B
               </span>
-              <span className="px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-slate-400">
+              <span className={`px-3 py-1 rounded-full border ${
+                isDark ? 'bg-slate-900 border-slate-800 text-slate-400' : 'bg-slate-100 border-slate-200 text-slate-600'
+              }`}>
                 BATCH 2026 – 2030
               </span>
             </div>
 
             <div className="space-y-2">
-              <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold font-tech tracking-tight text-white leading-tight">
-                <span className="inline-block text-glow-cyan glitch-hover">
+              <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold font-tech tracking-tight leading-tight">
+                <span className={`inline-block glitch-hover ${isDark ? 'text-white text-glow-orange' : 'text-slate-900'}`}>
                   AYUSH SINGH
                 </span>
               </h1>
-              <p className="text-lg sm:text-2xl font-tech font-semibold tracking-wider bg-gradient-to-r from-cyan-400 via-blue-400 to-pink-500 bg-clip-text text-transparent">
+              <p className="text-lg sm:text-2xl font-tech font-semibold tracking-wider bg-gradient-to-r from-orange-500 via-purple-600 to-cyan-500 bg-clip-text text-transparent">
                 {portfolioData.tagline}
               </p>
             </div>
 
-            <p className="max-w-3xl text-sm sm:text-base font-mono text-slate-300 leading-relaxed">
+            <p className={`max-w-3xl text-sm sm:text-base font-mono leading-relaxed ${
+              isDark ? 'text-slate-300' : 'text-slate-700'
+            }`}>
               Engineering statutory risk delay analytics with{' '}
-              <span className="text-cyan-300 font-semibold">XGBoost &amp; SHAP explainability</span>, and formulating hybrid{' '}
-              <span className="text-pink-400 font-semibold">QUBO / QAOA quantum optimization</span> for renewable microgrid
+              <span className={`font-semibold ${isDark ? 'text-orange-300' : 'text-orange-600'}`}>XGBoost &amp; SHAP explainability</span>, and formulating hybrid{' '}
+              <span className={`font-semibold ${isDark ? 'text-purple-400' : 'text-purple-600'}`}>QUBO / QAOA quantum optimization</span> for renewable microgrid
               dispatch. Specialized in high-performance reactive interfaces and explainable machine intelligence.
             </p>
 
-            {/* Social Icons with Clean Flexible Container (SPEC 2 & 5 - Never sliced/clipped) */}
+            {/* Social Icons Container */}
             <div className="flex flex-wrap items-center gap-3 pt-4 overflow-visible">
               <MagneticButton>
                 <a
                   href="#projects"
                   onClick={sfx.playClick}
                   onMouseEnter={sfx.playHover}
-                  className="px-6 py-3 rounded-xl bg-cyan-400 hover:bg-cyan-300 text-slate-950 font-mono font-bold text-xs shadow-[0_0_25px_rgba(0,240,255,0.5)] transition-all flex items-center gap-2 cursor-pointer"
+                  className="px-6 py-3 rounded-xl bg-gradient-to-r from-orange-500 to-purple-600 hover:brightness-110 text-white font-mono font-bold text-xs shadow-md transition-all flex items-center gap-2 cursor-pointer"
                 >
                   <Cpu className="w-4 h-4" />
                   <span>VIEW_SYSTEMS</span>
@@ -1609,15 +1944,18 @@ export default function App() {
                 <button
                   onClick={handleCopyEmail}
                   onMouseEnter={sfx.playHover}
-                  className="px-5 py-3 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-700 hover:border-cyan-400 text-slate-200 font-mono font-semibold text-xs transition-all flex items-center gap-2 cursor-pointer"
+                  className={`px-5 py-3 rounded-xl border font-mono font-semibold text-xs transition-all flex items-center gap-2 cursor-pointer ${
+                    isDark
+                      ? 'bg-slate-900/80 hover:bg-slate-800 border-slate-700 hover:border-orange-400 text-slate-200'
+                      : 'bg-white hover:bg-slate-50 border-slate-300 hover:border-purple-400 text-slate-800 shadow-xs'
+                  }`}
                   title="Copy Email"
                 >
-                  <Mail className="w-4 h-4 text-cyan-400" />
+                  <Mail className={`w-4 h-4 ${isDark ? 'text-orange-400' : 'text-purple-600'}`} />
                   <span>090109ayush@gmail.com</span>
                 </button>
               </MagneticButton>
 
-              {/* Exact Social Link Container: flex items-center justify-center w-10 h-10 rounded-xl bg-slate-900/80 border border-cyan-500/30 text-cyan-400 hover:border-cyan-400 hover:bg-cyan-500/10 hover:text-white transition-all duration-200 */}
               <MagneticButton>
                 <a
                   href="https://github.com/gameszoom325-cell"
@@ -1625,7 +1963,11 @@ export default function App() {
                   rel="noreferrer"
                   onClick={sfx.playClick}
                   onMouseEnter={sfx.playHover}
-                  className="flex items-center justify-center w-10 h-10 rounded-xl bg-slate-900/80 border border-cyan-500/30 text-cyan-400 hover:border-cyan-400 hover:bg-cyan-500/10 hover:text-white transition-all duration-200 cursor-pointer"
+                  className={`flex items-center justify-center w-10 h-10 rounded-xl border transition-all duration-200 cursor-pointer ${
+                    isDark
+                      ? 'bg-slate-900/80 border-orange-500/30 text-orange-400 hover:border-orange-400 hover:bg-orange-500/10 hover:text-white'
+                      : 'bg-white border-slate-300 text-slate-700 hover:border-purple-400 hover:bg-purple-50 hover:text-purple-700 shadow-xs'
+                  }`}
                   title="GitHub: gameszoom325-cell"
                 >
                   <Github className="w-5 h-5" />
@@ -1639,7 +1981,11 @@ export default function App() {
                   rel="noreferrer"
                   onClick={sfx.playClick}
                   onMouseEnter={sfx.playHover}
-                  className="flex items-center justify-center w-10 h-10 rounded-xl bg-slate-900/80 border border-cyan-500/30 text-cyan-400 hover:border-cyan-400 hover:bg-cyan-500/10 hover:text-white transition-all duration-200 cursor-pointer"
+                  className={`flex items-center justify-center w-10 h-10 rounded-xl border transition-all duration-200 cursor-pointer ${
+                    isDark
+                      ? 'bg-slate-900/80 border-orange-500/30 text-orange-400 hover:border-orange-400 hover:bg-orange-500/10 hover:text-white'
+                      : 'bg-white border-slate-300 text-slate-700 hover:border-purple-400 hover:bg-purple-50 hover:text-purple-700 shadow-xs'
+                  }`}
                   title="LinkedIn: Ayush Singh"
                 >
                   <Linkedin className="w-5 h-5" />
@@ -1653,7 +1999,11 @@ export default function App() {
                   rel="noreferrer"
                   onClick={sfx.playClick}
                   onMouseEnter={sfx.playHover}
-                  className="flex items-center justify-center w-10 h-10 rounded-xl bg-slate-900/80 border border-cyan-500/30 text-cyan-400 hover:border-cyan-400 hover:bg-cyan-500/10 hover:text-white transition-all duration-200 cursor-pointer"
+                  className={`flex items-center justify-center w-10 h-10 rounded-xl border transition-all duration-200 cursor-pointer ${
+                    isDark
+                      ? 'bg-slate-900/80 border-orange-500/30 text-orange-400 hover:border-orange-400 hover:bg-orange-500/10 hover:text-white'
+                      : 'bg-white border-slate-300 text-slate-700 hover:border-purple-400 hover:bg-purple-50 hover:text-purple-700 shadow-xs'
+                  }`}
                   title="Instagram: @ayush.rxt_"
                 >
                   <Instagram className="w-5 h-5" />
@@ -1661,9 +2011,9 @@ export default function App() {
               </MagneticButton>
             </div>
 
-            <div className="pt-10 flex items-center gap-3 text-xs font-mono text-slate-500">
-              <div className="w-5 h-8 rounded-full border border-slate-700 flex items-start justify-center p-1">
-                <div className="w-1.5 h-2 rounded-full bg-cyan-400 animate-bounce" />
+            <div className={`pt-10 flex items-center gap-3 text-xs font-mono ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
+              <div className={`w-5 h-8 rounded-full border flex items-start justify-center p-1 ${isDark ? 'border-slate-700' : 'border-slate-300'}`}>
+                <div className="w-1.5 h-2 rounded-full bg-orange-500 animate-bounce" />
               </div>
               <span>SCROLL TO INITIALIZE TELEMETRY</span>
             </div>
@@ -1671,21 +2021,25 @@ export default function App() {
         </motion.section>
 
         {/* =========================================================================
-            PROJECTS SECTION (BI-DIRECTIONAL MOTION REVEAL - SPEC 1 & LIVE LINKS SPEC 5)
+            PROJECTS SECTION
             ========================================================================= */}
         <motion.section
           id="projects"
           {...biDirectionalScroll}
           className="space-y-8 scroll-mt-24"
         >
-          <div className="border-b border-cyan-500/20 pb-4 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+          <div className={`border-b pb-4 flex flex-col sm:flex-row sm:items-end justify-between gap-4 ${
+            isDark ? 'border-orange-500/20' : 'border-slate-200'
+          }`}>
             <div>
-              <div className="text-xs font-mono text-cyan-400 tracking-widest mb-1">// DEPLOYED PLATFORMS</div>
-              <h2 className="text-2xl sm:text-4xl font-bold font-tech text-white">
+              <div className={`text-xs font-mono tracking-widest mb-1 ${isDark ? 'text-orange-400' : 'text-orange-600'}`}>
+                // DEPLOYED PLATFORMS
+              </div>
+              <h2 className="text-2xl sm:text-4xl font-bold font-tech">
                 01. 3D Holographic Project Matrix
               </h2>
             </div>
-            <div className="text-xs font-mono text-slate-400">
+            <div className={`text-xs font-mono ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
               REAL-TIME PERSPECTIVE (ROTATE X/Y)
             </div>
           </div>
@@ -1697,71 +2051,81 @@ export default function App() {
                 project={project}
                 onInspect={() => setSelectedProject(project)}
                 sfx={sfx}
+                isDark={isDark}
               />
             ))}
           </div>
         </motion.section>
 
         {/* =========================================================================
-            CASE STUDY PIPELINE (BI-DIRECTIONAL MOTION REVEAL - SPEC 1 & 5)
+            CASE STUDY PIPELINE
             ========================================================================= */}
         <motion.section
           id="case-studies"
           {...biDirectionalScroll}
           className="scroll-mt-24"
         >
-          <CaseStudyPipeline sfx={sfx} />
+          <CaseStudyPipeline sfx={sfx} isDark={isDark} />
         </motion.section>
 
         {/* =========================================================================
-            LIVE AI NEURAL PIPELINE & MODEL DIAGNOSTICS (SPEC 2 & 5)
-            (Replaced Bloch sphere with XGBoost + SHAP, Smart Farmer, & QUBO diagnostics)
+            LIVE AI NEURAL PIPELINE & MODEL DIAGNOSTICS
             ========================================================================= */}
         <motion.section
           id="neural-telemetry"
           {...biDirectionalScroll}
           className="scroll-mt-24"
         >
-          <LiveNeuralPipelineDiagnostics sfx={sfx} />
+          <LiveNeuralPipelineDiagnostics sfx={sfx} isDark={isDark} />
         </motion.section>
 
         {/* =========================================================================
-            SKILLS & TECHNICAL CAPABILITIES (BI-DIRECTIONAL MOTION REVEAL - SPEC 1 & 5)
+            SKILLS & TECHNICAL CAPABILITIES
             ========================================================================= */}
         <motion.section
           id="skills"
           {...biDirectionalScroll}
           className="space-y-8 scroll-mt-24"
         >
-          <div className="border-b border-cyan-500/20 pb-4">
-            <div className="text-xs font-mono text-cyan-400 tracking-widest mb-1">// SYSTEM MATRICES</div>
-            <h2 className="text-2xl sm:text-4xl font-bold font-tech text-white">
+          <div className={`border-b pb-4 ${isDark ? 'border-orange-500/20' : 'border-slate-200'}`}>
+            <div className={`text-xs font-mono tracking-widest mb-1 ${isDark ? 'text-orange-400' : 'text-orange-600'}`}>
+              // SYSTEM MATRICES
+            </div>
+            <h2 className="text-2xl sm:text-4xl font-bold font-tech">
               04. Technical Capabilities &amp; Stack Telemetry
             </h2>
           </div>
 
-          <SkillsTelemetryGrid sfx={sfx} />
+          <SkillsTelemetryGrid sfx={sfx} isDark={isDark} />
         </motion.section>
 
         {/* =========================================================================
-            CONTACT SECTION (BI-DIRECTIONAL MOTION REVEAL & CLEAN SOCIAL ICONS)
+            CONTACT SECTION
             ========================================================================= */}
         <motion.section
           id="contact"
           {...biDirectionalScroll}
           className="space-y-8 scroll-mt-24"
         >
-          <div className="rounded-2xl bg-gradient-to-b from-[#080f24] to-[#040713] border border-cyan-500/30 p-8 sm:p-12 text-center space-y-6 shadow-[0_0_40px_rgba(0,240,255,0.15)] cyber-corner-tr">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/80 border border-cyan-500/40 text-xs font-mono text-cyan-300">
-              <Radio className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
+          <div className={`rounded-2xl p-8 sm:p-12 text-center space-y-6 shadow-xl cyber-corner-tr border transition-all ${
+            isDark
+              ? 'bg-gradient-to-b from-[#121218] to-[#07070a] border-orange-500/30 shadow-[0_0_40px_rgba(249,115,22,0.15)] text-slate-100'
+              : 'bg-white border-slate-200 shadow-xl text-slate-900'
+          }`}>
+            <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono border ${
+              isDark ? 'bg-orange-950/80 border-orange-500/40 text-orange-300' : 'bg-orange-50 border-orange-200 text-orange-800'
+            }`}>
+              <Radio className="w-3.5 h-3.5 text-orange-500 animate-pulse" />
               <span>TRANSMISSION PROTOCOL OPEN</span>
             </div>
 
-            <h2 className="text-3xl sm:text-5xl font-bold font-tech text-white">
+            <h2 className="text-3xl sm:text-5xl font-bold font-tech">
               Initialize Direct Transmission
             </h2>
 
-            <p className="max-w-2xl mx-auto font-mono text-xs sm:text-sm text-slate-300 leading-relaxed">
+            <p className={`max-w-2xl mx-auto font-mono text-xs sm:text-sm leading-relaxed ${
+              isDark ? 'text-slate-300' : 'text-slate-600'
+            }`}>
               Available for AI/ML engineering, quantum computing modeling, SIH collaboration, and high-performance creative development.
             </p>
 
@@ -1770,7 +2134,7 @@ export default function App() {
                 <button
                   onClick={handleCopyEmail}
                   onMouseEnter={sfx.playHover}
-                  className="px-8 py-4 rounded-xl bg-cyan-400 hover:bg-cyan-300 text-slate-950 font-mono font-bold text-xs shadow-[0_0_25px_rgba(0,240,255,0.4)] transition-all flex items-center gap-2 cursor-pointer"
+                  className="px-8 py-4 rounded-xl bg-gradient-to-r from-orange-500 to-purple-600 hover:brightness-110 text-white font-mono font-bold text-xs shadow-lg transition-all flex items-center gap-2 cursor-pointer"
                 >
                   <Copy className="w-4 h-4" />
                   <span>COPY: 090109ayush@gmail.com</span>
@@ -1778,7 +2142,6 @@ export default function App() {
               </MagneticButton>
             </div>
 
-            {/* Social Icons Container (SPEC 2 & 5) */}
             <div className="pt-6 flex flex-wrap items-center justify-center gap-4 text-xs font-mono">
               <MagneticButton>
                 <a
@@ -1787,7 +2150,11 @@ export default function App() {
                   rel="noreferrer"
                   onClick={sfx.playClick}
                   onMouseEnter={sfx.playHover}
-                  className="flex items-center justify-center w-10 h-10 rounded-xl bg-slate-900/80 border border-cyan-500/30 text-cyan-400 hover:border-cyan-400 hover:bg-cyan-500/10 hover:text-white transition-all duration-200 cursor-pointer"
+                  className={`flex items-center justify-center w-10 h-10 rounded-xl border transition-all duration-200 cursor-pointer ${
+                    isDark
+                      ? 'bg-slate-900/80 border-orange-500/30 text-orange-400 hover:border-orange-400 hover:bg-orange-500/10 hover:text-white'
+                      : 'bg-white border-slate-300 text-slate-700 hover:border-purple-400 hover:bg-purple-50 hover:text-purple-700 shadow-xs'
+                  }`}
                   title="GitHub"
                 >
                   <Github className="w-5 h-5" />
@@ -1801,7 +2168,11 @@ export default function App() {
                   rel="noreferrer"
                   onClick={sfx.playClick}
                   onMouseEnter={sfx.playHover}
-                  className="flex items-center justify-center w-10 h-10 rounded-xl bg-slate-900/80 border border-cyan-500/30 text-cyan-400 hover:border-cyan-400 hover:bg-cyan-500/10 hover:text-white transition-all duration-200 cursor-pointer"
+                  className={`flex items-center justify-center w-10 h-10 rounded-xl border transition-all duration-200 cursor-pointer ${
+                    isDark
+                      ? 'bg-slate-900/80 border-orange-500/30 text-orange-400 hover:border-orange-400 hover:bg-orange-500/10 hover:text-white'
+                      : 'bg-white border-slate-300 text-slate-700 hover:border-purple-400 hover:bg-purple-50 hover:text-purple-700 shadow-xs'
+                  }`}
                   title="LinkedIn"
                 >
                   <Linkedin className="w-5 h-5" />
@@ -1815,7 +2186,11 @@ export default function App() {
                   rel="noreferrer"
                   onClick={sfx.playClick}
                   onMouseEnter={sfx.playHover}
-                  className="flex items-center justify-center w-10 h-10 rounded-xl bg-slate-900/80 border border-cyan-500/30 text-cyan-400 hover:border-cyan-400 hover:bg-cyan-500/10 hover:text-white transition-all duration-200 cursor-pointer"
+                  className={`flex items-center justify-center w-10 h-10 rounded-xl border transition-all duration-200 cursor-pointer ${
+                    isDark
+                      ? 'bg-slate-900/80 border-orange-500/30 text-orange-400 hover:border-orange-400 hover:bg-orange-500/10 hover:text-white'
+                      : 'bg-white border-slate-300 text-slate-700 hover:border-purple-400 hover:bg-purple-50 hover:text-purple-700 shadow-xs'
+                  }`}
                   title="Instagram"
                 >
                   <Instagram className="w-5 h-5" />
@@ -1825,18 +2200,20 @@ export default function App() {
           </div>
         </motion.section>
 
-        {/* Footer (Clean SRM IST references with zero placeholder text) */}
-        <footer className="pt-8 pb-16 border-t border-slate-800/80 text-xs font-mono text-slate-400">
+        {/* Footer */}
+        <footer className={`pt-8 pb-16 border-t text-xs font-mono ${
+          isDark ? 'border-slate-800/80 text-slate-400' : 'border-slate-200 text-slate-500'
+        }`}>
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
             <div>
-              <div className="text-white font-tech font-bold text-sm">
+              <div className={`font-tech font-bold text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>
                 AYUSH SINGH // SRM INSTITUTE OF SCIENCE AND TECHNOLOGY
               </div>
               <div className="text-slate-500">
                 B.Tech Computer Science &amp; Engineering (AI &amp; ML), Section B, Batch 2026–2030
               </div>
             </div>
-            <div className="text-cyan-400/80">
+            <div className={`font-semibold ${isDark ? 'text-orange-400/80' : 'text-purple-600'}`}>
               SRM IST // COMPUTER SCIENCE &amp; ENGINEERING (AI &amp; ML)
             </div>
           </div>
@@ -1847,20 +2224,28 @@ export default function App() {
       {selectedProject && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
           <div
-            className="fixed inset-0 bg-[#02050f]/85 backdrop-blur-md transition-opacity"
+            className={`fixed inset-0 backdrop-blur-md transition-opacity ${
+              isDark ? 'bg-black/85' : 'bg-slate-900/40'
+            }`}
             onClick={() => {
               sfx.playClick();
               setSelectedProject(null);
             }}
           />
 
-          <div className="relative z-10 w-full max-w-3xl bg-[#070b1a] border border-cyan-400 rounded-xl shadow-[0_0_50px_rgba(0,240,255,0.25)] overflow-hidden text-slate-100 cyber-corner-tr my-8">
-            <div className="flex items-center justify-between px-6 py-4 bg-slate-900/90 border-b border-cyan-500/20">
+          <div className={`relative z-10 w-full max-w-3xl rounded-xl shadow-2xl overflow-hidden cyber-corner-tr my-8 border ${
+            isDark
+              ? 'bg-[#0a0a10] border-orange-500 text-slate-100 shadow-[0_0_50px_rgba(249,115,22,0.25)]'
+              : 'bg-white border-slate-300 text-slate-900 shadow-2xl'
+          }`}>
+            <div className={`flex items-center justify-between px-6 py-4 border-b ${
+              isDark ? 'bg-slate-900/90 border-orange-500/20' : 'bg-slate-50 border-slate-200'
+            }`}>
               <div>
-                <div className="text-[11px] font-mono text-cyan-400">
+                <div className={`text-[11px] font-mono ${isDark ? 'text-orange-400' : 'text-orange-600 font-semibold'}`}>
                   SPECIFICATION ARCHITECTURE // {selectedProject.badge}
                 </div>
-                <h3 className="text-xl font-bold font-tech text-white">
+                <h3 className="text-xl font-bold font-tech">
                   {selectedProject.title}
                 </h3>
               </div>
@@ -1870,35 +2255,47 @@ export default function App() {
                   setSelectedProject(null);
                 }}
                 onMouseEnter={sfx.playHover}
-                className="p-2 rounded-lg bg-slate-800 hover:bg-red-950 border border-slate-700 hover:border-red-500 text-slate-400 hover:text-red-400 transition-colors cursor-pointer"
+                className={`p-2 rounded-lg border transition-colors cursor-pointer ${
+                  isDark
+                    ? 'bg-slate-800 hover:bg-red-950 border-slate-700 hover:border-red-500 text-slate-400 hover:text-red-400'
+                    : 'bg-white hover:bg-red-50 border-slate-300 hover:border-red-400 text-slate-500 hover:text-red-600'
+                }`}
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             <div className="p-6 space-y-6 max-h-[75vh] overflow-y-auto">
-              <div className="p-4 rounded-lg bg-cyan-950/20 border border-cyan-500/20 text-xs sm:text-sm font-mono text-slate-300 leading-relaxed">
+              <div className={`p-4 rounded-lg border text-xs sm:text-sm font-mono leading-relaxed ${
+                isDark ? 'bg-orange-950/20 border-orange-500/20 text-slate-300' : 'bg-purple-50/50 border-purple-200 text-slate-700'
+              }`}>
                 {selectedProject.architecture?.summary || selectedProject.description}
               </div>
 
               {selectedProject.architecture?.layers && (
                 <div className="space-y-3">
-                  <div className="text-xs font-mono text-slate-400">SYSTEM EXECUTION PIPELINE</div>
+                  <div className={`text-xs font-mono ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                    SYSTEM EXECUTION PIPELINE
+                  </div>
                   <div className="space-y-2">
                     {selectedProject.architecture.layers.map((layer, idx) => (
                       <div
                         key={idx}
-                        className="p-3 rounded-lg bg-slate-900/60 border border-slate-800"
+                        className={`p-3 rounded-lg border ${
+                          isDark ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-50 border-slate-200'
+                        }`}
                       >
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="text-[10px] font-mono text-cyan-400 px-1.5 py-0.5 rounded bg-cyan-950 border border-cyan-800">
+                          <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded border ${
+                            isDark ? 'bg-orange-950 border-orange-800 text-orange-400' : 'bg-orange-100 border-orange-200 text-orange-800 font-semibold'
+                          }`}>
                             LAYER 0{idx + 1}
                           </span>
-                          <h4 className="text-xs font-bold font-tech text-white">
+                          <h4 className="text-xs font-bold font-tech">
                             {layer.name}
                           </h4>
                         </div>
-                        <p className="text-[11px] font-mono text-slate-400 pl-7">
+                        <p className={`text-[11px] font-mono pl-7 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
                           {layer.detail}
                         </p>
                       </div>
@@ -1908,12 +2305,18 @@ export default function App() {
               )}
 
               <div>
-                <div className="text-xs font-mono text-slate-400 mb-2">// STACK ENCODING</div>
+                <div className={`text-xs font-mono mb-2 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                  // STACK ENCODING
+                </div>
                 <div className="flex flex-wrap gap-1.5">
                   {selectedProject.tags.map((tag, idx) => (
                     <span
                       key={idx}
-                      className="px-2.5 py-1 text-xs font-mono rounded bg-slate-800/80 text-cyan-300 border border-cyan-500/20"
+                      className={`px-2.5 py-1 text-xs font-mono rounded border ${
+                        isDark
+                          ? 'bg-slate-800/80 text-orange-300 border-orange-500/20'
+                          : 'bg-purple-50 text-purple-700 border-purple-200'
+                      }`}
                     >
                       #{tag}
                     </span>
@@ -1922,8 +2325,10 @@ export default function App() {
               </div>
             </div>
 
-            {/* Modal Action Buttons (Direct Links - Spec 5) */}
-            <div className="flex items-center justify-between px-6 py-4 bg-slate-900/90 border-t border-slate-800">
+            {/* Modal Action Buttons */}
+            <div className={`flex items-center justify-between px-6 py-4 border-t ${
+              isDark ? 'bg-slate-900/90 border-slate-800' : 'bg-slate-50 border-slate-200'
+            }`}>
               <span className="text-xs font-mono text-slate-500">ID: {selectedProject.id}</span>
               <div className="flex items-center gap-3">
                 <a
@@ -1932,7 +2337,11 @@ export default function App() {
                   rel="noreferrer"
                   onClick={sfx.playClick}
                   onMouseEnter={sfx.playHover}
-                  className="flex items-center gap-2 px-4 py-2 text-xs font-mono font-medium rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 transition-all cursor-pointer"
+                  className={`flex items-center gap-2 px-4 py-2 text-xs font-mono font-medium rounded-lg border transition-all cursor-pointer ${
+                    isDark
+                      ? 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-slate-200'
+                      : 'bg-white hover:bg-slate-100 border-slate-300 text-slate-800 shadow-xs'
+                  }`}
                 >
                   <Github className="w-4 h-4" />
                   <span>REPOSITORY</span>
@@ -1943,7 +2352,7 @@ export default function App() {
                   rel="noreferrer"
                   onClick={sfx.playClick}
                   onMouseEnter={sfx.playHover}
-                  className="flex items-center gap-2 px-4 py-2 text-xs font-mono font-bold rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 transition-all shadow-[0_0_15px_rgba(0,240,255,0.4)] cursor-pointer"
+                  className="flex items-center gap-2 px-4 py-2 text-xs font-mono font-bold rounded-lg bg-gradient-to-r from-orange-500 to-purple-600 hover:brightness-110 text-white transition-all shadow-md cursor-pointer"
                 >
                   <ExternalLink className="w-4 h-4" />
                   <span>LAUNCH_DEMO</span>

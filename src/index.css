@@ -3,17 +3,38 @@
 @layer base {
   :root {
     color-scheme: dark;
+    --bg-canvas: #09090b;
+    --text-main: #f3f4f6;
+    --text-muted: #9ca3af;
+    --card-surface: #0f0f13;
+    --card-border: rgba(249, 115, 22, 0.25);
+  }
+
+  html.light-theme,
+  html.light {
+    color-scheme: light;
+    --bg-canvas: #f8fafc;
+    --text-main: #0f172a;
+    --text-muted: #64748b;
+    --card-surface: #ffffff;
+    --card-border: #e2e8f0;
   }
   
-  html {
+  html, body, #root {
     scroll-behavior: smooth;
     font-family: 'JetBrains Mono', monospace;
+    background: transparent !important;
+    background-color: transparent !important;
   }
 
   body {
-    background-color: #030712;
-    color: #e2e8f0;
+    color: #f3f4f6;
     overflow-x: hidden;
+  }
+
+  html.light-theme body,
+  html.light body {
+    color: #0f172a;
   }
 }
 
@@ -39,44 +60,54 @@
   clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 100%, 0 100%);
 }
 
-/* Neon Glow effects */
-.glow-cyan {
-  box-shadow: 0 0 25px rgba(0, 240, 255, 0.3), inset 0 0 15px rgba(0, 240, 255, 0.1);
+/* Neon Glow effects - Dark Theme */
+.glow-orange {
+  box-shadow: 0 0 25px rgba(249, 115, 22, 0.35), inset 0 0 15px rgba(249, 115, 22, 0.12);
 }
 
-.glow-magenta {
-  box-shadow: 0 0 25px rgba(255, 0, 127, 0.3), inset 0 0 15px rgba(255, 0, 127, 0.1);
+.glow-purple {
+  box-shadow: 0 0 25px rgba(168, 85, 247, 0.35), inset 0 0 15px rgba(168, 85, 247, 0.12);
 }
 
-.glow-cobalt {
-  box-shadow: 0 0 25px rgba(0, 102, 255, 0.3), inset 0 0 15px rgba(0, 102, 255, 0.1);
+.text-glow-orange {
+  text-shadow: 0 0 14px rgba(249, 115, 22, 0.8), 0 0 28px rgba(249, 115, 22, 0.35);
 }
 
-.text-glow-cyan {
-  text-shadow: 0 0 14px rgba(0, 240, 255, 0.8), 0 0 28px rgba(0, 240, 255, 0.4);
+.text-glow-purple {
+  text-shadow: 0 0 14px rgba(168, 85, 247, 0.8);
 }
 
-.text-glow-magenta {
-  text-shadow: 0 0 14px rgba(255, 0, 127, 0.8), 0 0 28px rgba(255, 0, 127, 0.4);
-}
-
-.text-glow-cobalt {
-  text-shadow: 0 0 14px rgba(0, 102, 255, 0.8);
-}
-
-/* Subtle Aurora Gradient Mesh in Background */
+/* Aurora Gradient Mesh in Background */
 .aurora-mesh {
   background: 
-    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(0, 240, 255, 0.12), transparent),
-    radial-gradient(ellipse 60% 40% at 90% 40%, rgba(255, 0, 127, 0.08), transparent),
-    radial-gradient(ellipse 50% 50% at 10% 80%, rgba(0, 102, 255, 0.1), transparent);
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(249, 115, 22, 0.12), transparent),
+    radial-gradient(ellipse 60% 40% at 90% 40%, rgba(168, 85, 247, 0.10), transparent),
+    radial-gradient(ellipse 50% 50% at 10% 80%, rgba(0, 240, 255, 0.08), transparent);
+}
+
+html.light-theme .aurora-mesh,
+html.light .aurora-mesh {
+  background: 
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(249, 115, 22, 0.07), transparent),
+    radial-gradient(ellipse 60% 40% at 90% 40%, rgba(168, 85, 247, 0.06), transparent),
+    radial-gradient(ellipse 50% 50% at 10% 80%, rgba(14, 165, 233, 0.05), transparent);
 }
 
 /* Technical Vector Grid Overlay */
 .cyber-grid-pattern {
+  background-color: transparent !important;
   background-image: 
-    linear-gradient(to right, rgba(0, 240, 255, 0.05) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(0, 240, 255, 0.05) 1px, transparent 1px);
+    linear-gradient(to right, rgba(249, 115, 22, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(249, 115, 22, 0.04) 1px, transparent 1px);
+  background-size: 44px 44px;
+}
+
+html.light-theme .cyber-grid-pattern,
+html.light .cyber-grid-pattern {
+  background-color: transparent !important;
+  background-image: 
+    linear-gradient(to right, rgba(100, 116, 139, 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(100, 116, 139, 0.06) 1px, transparent 1px);
   background-size: 44px 44px;
 }
 
@@ -100,18 +131,29 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: #030712;
+  background: #09090b;
+}
+
+html.light-theme ::-webkit-scrollbar-track,
+html.light ::-webkit-scrollbar-track {
+  background: #f1f5f9;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1e293b;
+  background: #27272a;
   border-radius: 2px;
-  border: 1px solid rgba(0, 240, 255, 0.3);
+  border: 1px solid rgba(249, 115, 22, 0.3);
+}
+
+html.light-theme ::-webkit-scrollbar-thumb,
+html.light ::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border: 1px solid rgba(168, 85, 247, 0.4);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 240, 255, 0.7);
-  box-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+  background: rgba(249, 115, 22, 0.7);
+  box-shadow: 0 0 10px rgba(249, 115, 22, 0.5);
 }
 
 /* Glitch text effect keyframes */
@@ -138,24 +180,40 @@
   animation: scanline 8s linear infinite;
 }
 
-/* Subtle CRT Scanline & Vignette Overlay (Spec 4) */
+/* Subtle CRT Scanline & Vignette Overlay */
 .crt-scanlines {
   background: repeating-linear-gradient(
     0deg,
-    rgba(0, 0, 0, 0.18),
-    rgba(0, 0, 0, 0.18) 1.5px,
+    rgba(0, 0, 0, 0.16),
+    rgba(0, 0, 0, 0.16) 1.5px,
     transparent 1.5px,
     transparent 3px
   );
-  opacity: 0.10;
+  opacity: 0.08;
+  transition: opacity 0.3s ease;
+}
+
+html.light-theme .crt-scanlines,
+html.light .crt-scanlines {
+  opacity: 0.015;
 }
 
 .crt-vignette {
   background: radial-gradient(
     ellipse at center,
     transparent 55%,
-    rgba(2, 5, 15, 0.45) 85%,
-    rgba(2, 5, 15, 0.85) 100%
+    rgba(9, 9, 11, 0.45) 85%,
+    rgba(9, 9, 11, 0.85) 100%
   );
+  transition: background 0.3s ease;
 }
 
+html.light-theme .crt-vignette,
+html.light .crt-vignette {
+  background: radial-gradient(
+    ellipse at center,
+    transparent 72%,
+    rgba(226, 232, 240, 0.35) 90%,
+    rgba(203, 213, 225, 0.6) 100%
+  );
+}
