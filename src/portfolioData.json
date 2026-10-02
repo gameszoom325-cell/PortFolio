@@ -1,0 +1,342 @@
+{
+  "id": "ayush-singh",
+  "name": "Ayush Singh",
+  "tagline": "AI/ML • WEB • QUANTUM • CREATIVE TECHNOLOGY",
+  "contact": {
+    "email": "090109ayush@gmail.com",
+    "github": "https://github.com/gameszoom325-cell",
+    "linkedin": "https://www.linkedin.com/in/ayush-singh-705a63397?utm_source=share_via&utm_content=profile&utm_medium=member_android",
+    "instagram": "https://www.instagram.com/ayush.rxt_?stkn=aDM1NDE1ZnV1bXBw"
+  },
+  "education": {
+    "institution": "SRM Institute of Science and Technology",
+    "degree": "B.Tech",
+    "fieldOfStudy": "Computer Science & Engineering",
+    "specialization": "AI & ML",
+    "section": "Section B",
+    "batch": {
+      "startYear": 2026,
+      "endYear": 2030
+    }
+  },
+  "projects": [
+    {
+      "id": "landwatch",
+      "title": "LandWatch",
+      "category": "AI & Data Analytics",
+      "badge": "Smart India Hackathon 2026",
+      "description": "Statutory risk and municipal delay predictive analytics engine powered by tuned XGBoost ensembles and game-theoretic SHAP explainability.",
+      "tags": [
+        "XGBoost",
+        "SHAP",
+        "Explainable AI",
+        "Geospatial Risk",
+        "Delay Modeling",
+        "Python"
+      ],
+      "stats": [
+        {
+          "id": "model-accuracy",
+          "label": "Prediction AUC-ROC",
+          "value": "0.942",
+          "unit": "ROC"
+        },
+        {
+          "id": "processing-speed",
+          "label": "Inference Latency",
+          "value": "38",
+          "unit": "ms"
+        },
+        {
+          "id": "dataset-size",
+          "label": "Trained Statutory Records",
+          "value": "150k+",
+          "unit": "filings"
+        }
+      ],
+      "architecture": {
+        "summary": "Distributed spatial risk modeling pipeline integrating municipal statutory filings, GIS constraints, and historical delay vectors with mathematical SHAP waterfall factor attribution.",
+        "layers": [
+          { "name": "Ingestion Layer", "detail": "Automated ETL stream normalizing municipal zoning clearances, statutory litigation registries, and GIS environmental maps." },
+          { "name": "Feature Engineering", "detail": "Constructs high-dimensional lag features, statutory clearance timelines, and jurisdiction compliance indices." },
+          { "name": "Inference Kernel", "detail": "Tuned gradient boosted trees with 5-fold cross validation for robust project delay scoring." },
+          { "name": "Explainability HUD", "detail": "SHAP TreeExplainer generating real-time waterfall charts for regulatory and judicial auditability." }
+        ],
+        "keyFeatures": [
+          "Explainable prediction graphs for regulatory clearance hearings",
+          "Automated delay penalty cost matrix calculation",
+          "Real-time municipal portal API ingestion stream",
+          "Interactive factor attribution breakdown"
+        ],
+        "githubUrl": "https://github.com/gameszoom325-cell/landwatch",
+        "demoUrl": "https://landwatch-tau.vercel.app/"
+      }
+    },
+    {
+      "id": "quantum-optimization-renewable-energy",
+      "title": "Quantum Energy Optimization",
+      "category": "Quantum Computing",
+      "badge": "Clean Energy Computing",
+      "description": "Renewable microgrid dispatch optimization through Quadratic Unconstrained Binary Optimization (QUBO) matrices, QAOA variational circuits, and Python computational modeling.",
+      "tags": [
+        "QUBO",
+        "QAOA",
+        "Quantum Circuits",
+        "Python",
+        "Computational Modeling",
+        "Renewable Energy"
+      ],
+      "stats": [
+        {
+          "id": "grid-loss",
+          "label": "Grid Loss Reduction",
+          "value": "18.4",
+          "unit": "%"
+        },
+        {
+          "id": "qubits-sim",
+          "label": "State Vector Qubits",
+          "value": "24",
+          "unit": "Qubits"
+        },
+        {
+          "id": "qaoa-layers",
+          "label": "Ansatz Circuit Depth",
+          "value": "p=4",
+          "unit": "layers"
+        }
+      ],
+      "architecture": {
+        "summary": "Hybrid classical-quantum workflow mapping intermittent solar/wind renewable power inputs and battery state-of-charge constraints into Ising spin Hamiltonians resolved by QAOA circuits.",
+        "layers": [
+          { "name": "Problem Hamiltonian Formulation", "detail": "Translates multi-node generation constraints, battery cycle degradation, and transmission loads into QUBO matrices." },
+          { "name": "QAOA Parameter Optimization", "detail": "Variational quantum circuits applying alternating cost and mixer Hamiltonians to explore ground states." },
+          { "name": "Classical Optimizer (COBYLA)", "detail": "Feedback optimization loop minimizing expected energy eigenvalues on simulated quantum state vectors." },
+          { "name": "Optimal Dispatch Schedule", "detail": "Deterministic dispatch commands reducing peak transmission loss and auxiliary generator dependency." }
+        ],
+        "keyFeatures": [
+          "Polynomial-to-Ising mapping for battery storage cycling",
+          "QAOA depth p=1 to 4 parameter convergence benchmarks",
+          "Intermittent wind-solar co-dispatch validation",
+          "Python numerical simulation via Qiskit and NumPy"
+        ],
+        "githubUrl": "https://github.com/gameszoom325-cell/quantum-renewable-optimizer",
+        "demoUrl": "https://quantum-grid-opt.vercel.app"
+      }
+    },
+    {
+      "id": "smart-farmer-portal",
+      "title": "Smart Farmer Portal",
+      "category": "Web Development",
+      "badge": "AgriTech Innovation",
+      "description": "Progressive AgriTech web platform engineered for low-bandwidth rural connectivity with seamless English and Hindi localization and cryptographically secure OTP authentication.",
+      "tags": [
+        "AgriTech",
+        "React",
+        "Localization",
+        "Hindi / English",
+        "OTP Authentication",
+        "Progressive Web App"
+      ],
+      "stats": [
+        {
+          "id": "languages",
+          "label": "Supported Languages",
+          "value": "2",
+          "unit": "EN / HI"
+        },
+        {
+          "id": "retention",
+          "label": "Auth Success Rate",
+          "value": "99.2",
+          "unit": "%"
+        },
+        {
+          "id": "offline-cache",
+          "label": "Advisory Cache Time",
+          "value": "<100",
+          "unit": "ms"
+        }
+      ],
+      "architecture": {
+        "summary": "Accessible, high-resilience progressive web architecture engineered for low-bandwidth rural connectivity, multilingual voice/text support, and secure OTP verification.",
+        "layers": [
+          { "name": "Client Layer", "detail": "Fast React interface with offline-first caching and bilingual English/Hindi i18n dictionaries." },
+          { "name": "Security & Auth", "detail": "SMS/WhatsApp based OTP verification gateway with rate-limiting and session token generation." },
+          { "name": "Agri Intelligence API", "detail": "Integration with meteorological feeds, soil health telemetry, and APMC mandi pricing indices." },
+          { "name": "Data Storage", "detail": "Encrypted farmer profile and crop inventory database with lightweight delta syncing." }
+        ],
+        "keyFeatures": [
+          "Instant Hindi ⇄ English toggle with zero layout shift",
+          "Fast OTP verification with graceful fallback",
+          "Offline-first cached advisory cards",
+          "Mobile touch-first responsive design"
+        ],
+        "githubUrl": "https://github.com/gameszoom325-cell/smart-farmer-portal",
+        "demoUrl": "https://smartfarmerportal.vercel.app/"
+      }
+    },
+    {
+      "id": "knoxxed1ts",
+      "title": "KNOXXED1TS",
+      "category": "Creative Web Development",
+      "badge": "Creative Showreel & Motion",
+      "description": "High-octane creative showreel platform featuring custom WebGL transitions, frame-synced kinetic typography, adaptive video scrubbing, and zero-jank category sorting.",
+      "tags": [
+        "Video Editing",
+        "Motion Design",
+        "Creative Web",
+        "WebGL Animations",
+        "High-FPS",
+        "Performance"
+      ],
+      "stats": [
+        {
+          "id": "lighthouse",
+          "label": "Lighthouse Score",
+          "value": "99",
+          "unit": "/100"
+        },
+        {
+          "id": "target-fps",
+          "label": "Playback Stability",
+          "value": "60",
+          "unit": "FPS"
+        },
+        {
+          "id": "compression",
+          "label": "Asset Efficiency",
+          "value": "4.2x",
+          "unit": "optimized"
+        }
+      ],
+      "architecture": {
+        "summary": "High-octane creative showreel platform powered by hardware-accelerated WebGL transitions, responsive video scrubbing, and zero-jank category sorting.",
+        "layers": [
+          { "name": "Media Pipeline", "detail": "Adaptive HLS/MP4 video delivery with progressive poster loading and instant preview hover states." },
+          { "name": "Interaction Engine", "detail": "Custom spring physics and frame-synced motion primitives for seamless reel inspection." },
+          { "name": "Dynamic Filtering", "detail": "Client-side category indexing for anime, cinematic, commercial, and rhythm montage edits." },
+          { "name": "Render Optimization", "detail": "Offscreen canvas buffering and IntersectionObserver-driven autoplay governance." }
+        ],
+        "keyFeatures": [
+          "Silky smooth video showcase with custom scrubbing",
+          "Cyber aesthetic typography and motion pacing",
+          "Zero layout shift media container hierarchy",
+          "Instant genre and resolution filter tags"
+        ],
+        "githubUrl": "https://github.com/gameszoom325-cell/knoxxed1ts",
+        "demoUrl": "https://knoxxed1ts.vercel.app"
+      }
+    }
+  ],
+  "caseStudies": [
+    {
+      "id": "landwatch-pipeline",
+      "title": "LandWatch: Statutory Delay & Risk Engine",
+      "subtitle": "Smart India Hackathon 2026 Project Pipeline",
+      "description": "A deep architectural walkthrough of how LandWatch converts chaotic municipal legal records into audited mathematical delay predictions.",
+      "steps": [
+        {
+          "step": "01",
+          "title": "Problem Context",
+          "description": "Infrastructure & commercial development projects in India face an average of 14-26 months of statutory delay due to disjoint municipal, environmental, and litigation clearances.",
+          "metric": "14-26 Mo",
+          "metricLabel": "Avg Delay Cost"
+        },
+        {
+          "step": "02",
+          "title": "Civic Data ETL Pipeline",
+          "description": "Automated ingestion parsers aggregate GIS shapefiles, high court litigation registries, state RERA statutory disclosures, and forest clearance statuses into a unified PostgreSQL/Vector database.",
+          "metric": "150,000+",
+          "metricLabel": "Processed Filings"
+        },
+        {
+          "step": "03",
+          "title": "XGBoost Machine Learning",
+          "description": "Trained gradient boosted decision trees with custom loss penalties evaluating statutory risk scores, project size, regional clearance velocity, and litigation volatility.",
+          "metric": "0.942",
+          "metricLabel": "Test AUC-ROC"
+        },
+        {
+          "step": "04",
+          "title": "SHAP Explainability Kernel",
+          "description": "Calculates Shapley additive values for every feature. Rather than a black box, each predicted delay outputs a transparent factor waterfall showing exactly why risks were scored high.",
+          "metric": "<40ms",
+          "metricLabel": "Shapley Attribution"
+        },
+        {
+          "step": "05",
+          "title": "Interactive Risk HUD",
+          "description": "Civic officers and project managers view dynamic spatial heatmaps, statutory delay projections, and judicial mitigation recommendations in real time.",
+          "metric": "Real-Time",
+          "metricLabel": "Spatial Monitoring"
+        }
+      ]
+    },
+    {
+      "id": "quantum-pipeline",
+      "title": "Quantum Grid Optimization Engine",
+      "subtitle": "QUBO & QAOA Microgrid Simulation",
+      "description": "Bridging quantum computing and sustainable energy by formulating renewable storage dispatch as an Ising Hamiltonian solved via hybrid variational circuits.",
+      "steps": [
+        {
+          "step": "01",
+          "title": "Renewable Input Telemetry",
+          "description": "Solar irradiance, wind velocity forecasts, variable consumer load curves, and battery storage state-of-charge are ingested on 15-minute operational dispatch intervals.",
+          "metric": "15-Min",
+          "metricLabel": "Interval Horizon"
+        },
+        {
+          "step": "02",
+          "title": "Binary Mapping to QUBO",
+          "description": "Discrete generator dispatch decisions and charge/discharge states are mapped into binary variables {0, 1} with quadratic penalty terms for grid imbalances.",
+          "metric": "N-Node",
+          "metricLabel": "QUBO Matrix"
+        },
+        {
+          "step": "03",
+          "title": "Ising Hamiltonian Synthesis",
+          "description": "Variables are translated into Pauli-Z spin operators (σz) constructing the problem Hamiltonian HC whose ground state represents the lowest-cost emission dispatch.",
+          "metric": "24 Qubits",
+          "metricLabel": "Circuit Simulation"
+        },
+        {
+          "step": "04",
+          "title": "QAOA Variational Circuit",
+          "description": "Parameterized single-qubit rotations and entangling CNOT gates alternate across p-layers, optimized classically via COBYLA feedback loops to find optimal gamma (γ) and beta (β) angles.",
+          "metric": "p = 4",
+          "metricLabel": "Ansatz Depth"
+        },
+        {
+          "step": "05",
+          "title": "Optimal Grid Dispatch",
+          "description": "High-probability quantum bitstrings decode directly into physical power dispatch orders, achieving 18.4% grid loss reduction while guaranteeing storage lifespan.",
+          "metric": "18.4%",
+          "metricLabel": "Loss Reduction"
+        }
+      ]
+    }
+  ],
+  "skills": [
+    { "name": "Python", "category": "AI / ML", "level": 94, "highlight": "Data pipelines, ML modeling, Numerical simulations" },
+    { "name": "XGBoost", "category": "AI / ML", "level": 92, "highlight": "Gradient boosted ensembles, hyperparameter tuning" },
+    { "name": "SHAP", "category": "AI / ML", "level": 90, "highlight": "TreeExplainer, game-theoretic explainability" },
+    { "name": "SQL", "category": "AI / ML", "level": 88, "highlight": "Complex joins, analytical aggregation, indexing" },
+    { "name": "QUBO & QAOA", "category": "Quantum", "level": 85, "highlight": "Hamiltonian mapping, variational quantum circuits" },
+    { "name": "Qiskit / NumPy", "category": "Quantum", "level": 84, "highlight": "Quantum circuit simulation, linear algebra" },
+    { "name": "JavaScript / TypeScript", "category": "Web Dev", "level": 90, "highlight": "Modern ESNext, React, performance optimization" },
+    { "name": "HTML5 / Tailwind CSS", "category": "Web Dev", "level": 95, "highlight": "Cyberpunk HUDs, responsive layouts, Tailwind v4" },
+    { "name": "Git & GitHub", "category": "Tools", "level": 92, "highlight": "Version control, collaborative workflows, CI/CD" },
+    { "name": "Vercel & Cloud Deploy", "category": "Tools", "level": 90, "highlight": "Edge deployments, custom domains, monitoring" },
+    { "name": "Video Editing", "category": "Creative", "level": 96, "highlight": "Rhythm montage, pacing, audio synchronization" },
+    { "name": "Motion Design", "category": "Creative", "level": 93, "highlight": "Kinetic typography, cyber aesthetics, transitions" }
+  ],
+  "interests": [
+    { "title": "AI & Machine Learning", "desc": "Predictive modeling, deep representations, explainable intelligence", "vector": "01" },
+    { "title": "Quantum Computing", "desc": "QUBO, QAOA, variational circuits, optimization algorithms", "vector": "02" },
+    { "title": "Full-Stack Web Dev", "desc": "High-performance reactive interfaces, low-latency client architecture", "vector": "03" },
+    { "title": "Data Science & Analytics", "desc": "Geospatial telemetry, statutory risk matrices, decision graphs", "vector": "04" },
+    { "title": "Creative Motion & Editing", "desc": "Kinetic storytelling, audio-visual synthesis, high-FPS video platforms", "vector": "05" },
+    { "title": "Emerging Tech & UI/UX", "desc": "Modern cybernetic UI styling, tactile micro-interactions", "vector": "06" }
+  ]
+}
