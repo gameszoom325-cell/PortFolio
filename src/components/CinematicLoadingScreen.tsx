@@ -122,11 +122,11 @@ export default function CinematicLoadingScreen({ onEnter, isLightMode }: Cinemat
         }}
         exit={{ opacity: 0, scale: 1.1 }}
         transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
-        className="fixed inset-0 z-[100] flex flex-col justify-between p-6 sm:p-12 overflow-hidden select-none bg-black/60 backdrop-blur-md"
+        className="fixed inset-0 z-[100] flex flex-col justify-between p-6 sm:p-12 overflow-hidden select-none backdrop-blur-md"
         style={{
           background: isLightMode
-            ? 'radial-gradient(ellipse at center, rgba(255,255,255,0.48) 0%, rgba(226,232,240,0.82) 100%)'
-            : 'radial-gradient(ellipse at center, rgba(3,7,18,0.72) 0%, rgba(2,6,23,0.92) 100%)'
+            ? 'radial-gradient(ellipse at center, rgba(255,255,255,0.7) 0%, rgba(241,245,249,0.92) 100%)'
+            : 'radial-gradient(ellipse at center, rgba(8,8,8,0.78) 0%, #080808 100%)'
         }}
       >
         {/* Futuristic Cyber Grid & CRT scanlines */}
@@ -220,42 +220,42 @@ export default function CinematicLoadingScreen({ onEnter, isLightMode }: Cinemat
               </div>
 
               {/* Terminal Box */}
-              <div className={`rounded-2xl p-5 border text-left font-mono text-xs shadow-2xl relative overflow-hidden backdrop-blur-xl ${
+              <div className={`rounded-2xl p-5 border text-left font-mono text-xs shadow-2xl relative overflow-hidden backdrop-blur-2xl ${
                 isLightMode
-                  ? 'bg-white/85 border-slate-300 text-slate-900 shadow-slate-200'
-                  : 'bg-black/85 border-zinc-800 text-zinc-200 shadow-black'
+                  ? 'bg-white/85 border-slate-200 text-slate-900 shadow-slate-200'
+                  : 'bg-[rgba(255,255,255,0.03)] border-[rgba(255,255,255,0.1)] text-[#FFFFFF] shadow-2xl'
               }`}>
                 {/* Simulated Terminal Header */}
-                <div className="flex items-center justify-between pb-3 mb-3 border-b border-zinc-500/20 text-[10px] text-zinc-400">
+                <div className="flex items-center justify-between pb-3 mb-3 border-b border-white/10 text-[10px] text-[#9CA3AF]">
                   <div className="flex items-center gap-1.5">
                     <span className="w-2.5 h-2.5 rounded-full bg-red-500/80 inline-block" />
-                    <span className="w-2.5 h-2.5 rounded-full bg-yellow-500/80 inline-block" />
-                    <span className="w-2.5 h-2.5 rounded-full bg-green-500/80 inline-block" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#FFB703]/80 inline-block" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#80ED99]/80 inline-block" />
                     <span className="ml-2 font-mono">boot_sequence.sh</span>
                   </div>
-                  <span>INITIALIZING SURROGATES</span>
+                  <span className="text-[#00F5D4]">SEARCH // INITIALIZING SURROGATES</span>
                 </div>
 
                 <div className="space-y-1.5 min-h-[140px]">
                   {BOOT_LOGS.slice(0, currentLogIndex).map((log, idx) => (
-                    <div key={idx} className="flex items-start gap-2 text-emerald-400">
-                      <span className="text-zinc-500 font-mono select-none">&gt;</span>
-                      <span className="opacity-80">{log}</span>
+                    <div key={idx} className="flex items-start gap-2 text-[#80ED99]">
+                      <span className="text-[#9CA3AF] font-mono select-none">&gt;</span>
+                      <span className="opacity-90">{log}</span>
                     </div>
                   ))}
 
-                  <div className="flex items-start gap-2 text-amber-400 font-bold">
-                    <span className="text-amber-500 font-mono select-none">&gt;</span>
+                  <div className="flex items-start gap-2 text-[#FFB703] font-bold">
+                    <span className="text-[#FFB703] font-mono select-none">&gt;</span>
                     <span>{typedText}</span>
-                    <span className="w-2 h-4 bg-amber-400 inline-block animate-pulse align-middle" />
+                    <span className="w-2 h-4 bg-[#FFB703] inline-block animate-pulse align-middle" />
                   </div>
                 </div>
 
-                {/* Progress bar */}
-                <div className="mt-4 pt-3 border-t border-zinc-500/20">
-                  <div className="w-full h-1.5 rounded-full bg-zinc-800 overflow-hidden">
+                {/* Progress bar: Amber Gold to Electric Teal */}
+                <div className="mt-4 pt-3 border-t border-white/10">
+                  <div className="w-full h-1.5 rounded-full bg-white/5 overflow-hidden">
                     <motion.div
-                      className="h-full bg-gradient-to-r from-orange-500 via-amber-400 to-pink-500 shadow-[0_0_12px_#f97316]"
+                      className="h-full bg-gradient-to-r from-[#FFB703] via-[#00F5D4] to-[#80ED99] shadow-[0_0_12px_rgba(255,183,3,0.5)]"
                       animate={{ width: `${bootProgress}%` }}
                       transition={{ duration: 0.18 }}
                     />
@@ -273,35 +273,35 @@ export default function CinematicLoadingScreen({ onEnter, isLightMode }: Cinemat
               transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
               className="max-w-3xl w-full flex flex-col items-center space-y-8"
             >
-              {/* Status pill */}
+              {/* Status pill with Soft Mint / Electric Teal */}
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full border text-xs font-mono font-bold tracking-widest ${
                   isLightMode
-                    ? 'bg-amber-500/15 border-amber-600/40 text-amber-900 shadow-sm'
-                    : 'bg-amber-950/60 border-amber-500/40 text-amber-300 shadow-[0_0_20px_rgba(255,170,0,0.2)]'
+                    ? 'bg-amber-500/10 border-amber-600/30 text-amber-900 shadow-sm'
+                    : 'bg-[rgba(255,255,255,0.03)] border-[#80ED99]/40 text-[#80ED99] shadow-[0_0_15px_rgba(128,237,153,0.15)]'
                 }`}
               >
-                <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                <span>COMMAND CENTER UNLOCKED // SIH 2026 ACTIVE</span>
+                <ShieldCheck className="w-4 h-4 text-[#80ED99]" />
+                <span>AI RESEARCH ENVIRONMENT // ONLINE</span>
               </motion.div>
 
-              {/* CENTER NAME WITH 3D TEXT DEPTH, LIGHT SCAN AND GLITCH STAGGER */}
+              {/* CENTER NAME WITH 3D TEXT DEPTH & AMBER GOLD LIGHT BLOOM */}
               <div className="relative py-4 select-none">
                 {/* Light Scan Sweep across the Name */}
                 <motion.div
                   initial={{ translateX: '-100%' }}
                   animate={{ translateX: '200%' }}
                   transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
-                  className="absolute inset-y-0 w-32 bg-gradient-to-r from-transparent via-amber-400/25 to-transparent pointer-events-none blur-sm"
+                  className="absolute inset-y-0 w-32 bg-gradient-to-r from-transparent via-[#FFB703]/25 to-transparent pointer-events-none blur-sm"
                 />
 
                 {/* 3D Depth Extrusion Shadow Layer 1 */}
                 <h1
                   aria-hidden="true"
                   className={`absolute inset-0 flex items-center justify-center text-5xl sm:text-7xl md:text-8xl font-tech font-black tracking-widest opacity-35 translate-y-2 translate-x-2 blur-[1px] ${
-                    isLightMode ? 'text-amber-700' : 'text-amber-600'
+                    isLightMode ? 'text-amber-700' : 'text-[#FFB703]'
                   }`}
                 >
                   AYUSH SINGH
@@ -334,7 +334,7 @@ export default function CinematicLoadingScreen({ onEnter, isLightMode }: Cinemat
                       } ${
                         isLightMode
                           ? 'text-slate-950 drop-shadow-[0_2px_12px_rgba(245,158,11,0.3)]'
-                          : 'text-white text-glow-amber'
+                          : 'text-[#FFFFFF] text-glow-amber'
                       }`}
                     >
                       {char}
@@ -349,9 +349,9 @@ export default function CinematicLoadingScreen({ onEnter, isLightMode }: Cinemat
                   transition={{ delay: 0.55 }}
                   className="mt-3 flex items-center justify-center gap-3 text-xs sm:text-sm font-mono tracking-widest"
                 >
-                  <span className="text-amber-500 font-bold">AI / ML ENGINEER</span>
-                  <span className="text-zinc-500">•</span>
-                  <span className={isLightMode ? 'text-slate-700' : 'text-zinc-300'}>QUANTUM &amp; WEB ARCHITECT</span>
+                  <span className="text-[#FFB703] font-bold">AI / ML RESEARCHER</span>
+                  <span className="text-zinc-600">•</span>
+                  <span className="text-[#00F5D4] font-medium">FULL STACK &amp; QUANTUM</span>
                 </motion.div>
               </div>
 
@@ -369,20 +369,20 @@ export default function CinematicLoadingScreen({ onEnter, isLightMode }: Cinemat
                     className={`group px-8 py-3.5 rounded-2xl border text-xs sm:text-sm font-mono font-bold tracking-widest flex items-center gap-3 transition-all cursor-pointer shadow-lg ${
                       isLightMode
                         ? 'bg-white border-amber-500 text-slate-900 hover:bg-amber-50 hover:shadow-amber-500/20'
-                        : 'bg-black/75 border-amber-400 text-amber-300 hover:bg-amber-400 hover:text-black hover:shadow-[0_0_25px_rgba(255,170,0,0.6)]'
+                        : 'bg-[#FFB703] border-[#FFB703] text-black hover:bg-[#ffc32b] hover:shadow-[0_0_25px_rgba(255,183,3,0.5)]'
                     }`}
                   >
-                    <Sparkles className="w-4 h-4 text-amber-400 group-hover:rotate-180 transition-transform duration-500" />
+                    <Sparkles className="w-4 h-4 text-black group-hover:rotate-180 transition-transform duration-500" />
                     <span>SCROLL TO ENTER</span>
                     <motion.div
                       animate={{ y: [0, 5, 0] }}
                       transition={{ repeat: Infinity, duration: 1.2, ease: "easeInOut" }}
                     >
-                      <ChevronDown className="w-4 h-4" />
+                      <ChevronDown className="w-4 h-4 text-black" />
                     </motion.div>
                   </button>
 
-                  <div className="flex items-center gap-2 text-[11px] font-mono text-zinc-400 animate-pulse">
+                  <div className="flex items-center gap-2 text-[11px] font-mono text-[#9CA3AF] animate-pulse">
                     <span>[ MOUSE WHEEL • SWIPE UP • OR CLICK BUTTON ]</span>
                   </div>
                 </motion.div>

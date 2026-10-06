@@ -3,21 +3,27 @@
 @layer base {
   :root {
     color-scheme: dark;
-    --bg-canvas: #09090b;
-    --text-main: #f3f4f6;
-    --text-muted: #9ca3af;
-    --card-surface: #0f0f13;
-    --card-border: rgba(249, 115, 22, 0.25);
+    --bg-canvas: #080808;
+    --text-primary: #FFFFFF;
+    --text-secondary: #9CA3AF;
+    --surface-glass: rgba(255, 255, 255, 0.03);
+    --border-glass: rgba(255, 255, 255, 0.1);
+    --accent-amber: #FFB703;
+    --accent-teal: #00F5D4;
+    --accent-mint: #80ED99;
   }
 
   html.light-theme,
   html.light {
     color-scheme: light;
-    --bg-canvas: #f8fafc;
-    --text-main: #0f172a;
-    --text-muted: #64748b;
-    --card-surface: #ffffff;
-    --card-border: #e2e8f0;
+    --bg-canvas: #f6f8fa;
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --surface-glass: rgba(255, 255, 255, 0.75);
+    --border-glass: rgba(15, 23, 42, 0.08);
+    --accent-amber: #d97706;
+    --accent-teal: #0d9488;
+    --accent-mint: #16a34a;
   }
   
   html, body, #root {
@@ -38,13 +44,15 @@
   }
 
   body {
-    color: #f3f4f6;
+    color: #FFFFFF;
     overflow-x: hidden;
+    background-color: #080808;
   }
 
   html.light-theme body,
   html.light body {
     color: #0f172a;
+    background-color: #f6f8fa;
   }
 }
 
@@ -57,106 +65,257 @@
   font-family: 'JetBrains Mono', monospace;
 }
 
-/* Cyber corner cuts */
-.cyber-corner-tr {
-  clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%);
+/* =========================================================================
+   PREMIUM CRYSTAL GLASSMORPHISM & DYNAMIC REFLECTION SYSTEM
+   Apple Vision Pro & Lusion Studio inspired physical optical glass
+   ========================================================================= */
+
+@keyframes slowGlassSheen {
+  0% {
+    transform: translateX(-120%) translateY(-20%) rotate(25deg);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.12;
+  }
+  50% {
+    transform: translateX(120%) translateY(20%) rotate(25deg);
+    opacity: 0.08;
+  }
+  100% {
+    transform: translateX(240%) translateY(40%) rotate(25deg);
+    opacity: 0;
+  }
 }
 
-.cyber-corner-all {
-  clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 10px, 100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0 calc(100% - 10px), 0 10px);
+@keyframes glassBreathingFloat {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
 }
 
-.cyber-tab-cut {
-  clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 100%, 0 100%);
+.crystal-glass {
+  position: relative;
+  background: rgba(10, 10, 15, 0.72);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 24px;
+  box-shadow: 
+    0 12px 40px -10px rgba(0, 0, 0, 0.65),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.14),
+    inset 0 0 20px 0 rgba(255, 255, 255, 0.02);
+  overflow: hidden;
+  transition: 
+    transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+    background-color 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, box-shadow, border-color;
 }
 
-/* Neon Glow effects - Night City Highway Palette */
+html.light-theme .crystal-glass,
+html.light .crystal-glass {
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 
+    0 12px 35px -8px rgba(15, 23, 42, 0.08),
+    inset 0 1px 2px 0 rgba(255, 255, 255, 0.95);
+}
+
+/* Subtle continuous light sheen passing across real glass */
+.crystal-glass::after {
+  content: '';
+  position: absolute;
+  top: -60%;
+  left: -60%;
+  width: 220%;
+  height: 220%;
+  background: linear-gradient(
+    115deg,
+    transparent 35%,
+    rgba(255, 255, 255, 0.04) 47%,
+    rgba(255, 255, 255, 0.10) 50%,
+    rgba(255, 255, 255, 0.04) 53%,
+    transparent 65%
+  );
+  pointer-events: none;
+  animation: slowGlassSheen 18s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  z-index: 1;
+}
+
+html.light-theme .crystal-glass::after,
+html.light .crystal-glass::after {
+  background: linear-gradient(
+    115deg,
+    transparent 35%,
+    rgba(255, 255, 255, 0.25) 47%,
+    rgba(255, 255, 255, 0.55) 50%,
+    rgba(255, 255, 255, 0.25) 53%,
+    transparent 65%
+  );
+}
+
+/* Interactive Hover States: Amber or Teal illumination */
+.crystal-glass-hover-amber:hover {
+  transform: translateY(-5px) scale(1.012);
+  background-color: rgba(14, 14, 22, 0.82);
+  border-color: rgba(255, 183, 3, 0.40);
+  box-shadow: 
+    0 20px 50px -10px rgba(0, 0, 0, 0.85),
+    0 0 40px rgba(255, 183, 3, 0.12),
+    inset 0 1px 2px 0 rgba(255, 255, 255, 0.25),
+    inset 0 0 25px rgba(255, 183, 3, 0.06);
+}
+
+html.light-theme .crystal-glass-hover-amber:hover,
+html.light .crystal-glass-hover-amber:hover {
+  background-color: rgba(255, 255, 255, 0.94);
+  border-color: rgba(217, 119, 6, 0.45);
+  box-shadow: 
+    0 20px 45px -10px rgba(15, 23, 42, 0.14),
+    0 0 35px rgba(217, 119, 6, 0.15),
+    inset 0 1px 2px 0 rgba(255, 255, 255, 1);
+}
+
+.crystal-glass-hover-teal:hover {
+  transform: translateY(-5px) scale(1.012);
+  background-color: rgba(14, 14, 22, 0.82);
+  border-color: rgba(0, 245, 212, 0.40);
+  box-shadow: 
+    0 20px 50px -10px rgba(0, 0, 0, 0.85),
+    0 0 40px rgba(0, 245, 212, 0.12),
+    inset 0 1px 2px 0 rgba(255, 255, 255, 0.25),
+    inset 0 0 25px rgba(0, 245, 212, 0.06);
+}
+
+html.light-theme .crystal-glass-hover-teal:hover,
+html.light .crystal-glass-hover-teal:hover {
+  background-color: rgba(255, 255, 255, 0.94);
+  border-color: rgba(13, 148, 136, 0.45);
+  box-shadow: 
+    0 20px 45px -10px rgba(15, 23, 42, 0.14),
+    0 0 35px rgba(13, 148, 136, 0.15),
+    inset 0 1px 2px 0 rgba(255, 255, 255, 1);
+}
+
+/* Glass Floating Navbar Pill */
+.navbar-crystal-pill {
+  background: rgba(10, 10, 15, 0.75);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 
+    0 16px 45px -8px rgba(0, 0, 0, 0.75),
+    0 0 30px rgba(255, 183, 3, 0.05),
+    inset 0 1px 1px rgba(255, 255, 255, 0.2);
+}
+
+html.light-theme .navbar-crystal-pill,
+html.light .navbar-crystal-pill {
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(15, 23, 42, 0.10);
+  box-shadow: 
+    0 16px 40px -8px rgba(15, 23, 42, 0.15),
+    inset 0 1px 2px rgba(255, 255, 255, 0.95);
+}
+
+/* Glassmorphism Surface Container Standards */
+.glass-panel {
+  background-color: rgba(10, 10, 15, 0.72);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 24px;
+}
+
+.glass-panel-hover {
+  transition: all 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-panel-hover:hover {
+  transform: translateY(-4px) scale(1.012);
+  background-color: rgba(14, 14, 22, 0.82);
+  border-color: rgba(255, 183, 3, 0.40);
+  box-shadow: 
+    0 20px 45px rgba(0, 0, 0, 0.75), 
+    0 0 40px rgba(255, 183, 3, 0.12),
+    inset 0 1px 1px rgba(255, 255, 255, 0.2);
+}
+
+/* Primary Accent: Amber Gold #FFB703 Lighting Effects */
 .glow-amber {
-  box-shadow: 0 0 25px rgba(255, 170, 0, 0.35), inset 0 0 15px rgba(255, 170, 0, 0.12);
-}
-
-.glow-pink {
-  box-shadow: 0 0 25px rgba(255, 0, 85, 0.35), inset 0 0 15px rgba(255, 0, 85, 0.12);
-}
-
-.glow-orange {
-  box-shadow: 0 0 25px rgba(249, 115, 22, 0.35), inset 0 0 15px rgba(249, 115, 22, 0.12);
-}
-
-.glow-purple {
-  box-shadow: 0 0 25px rgba(168, 85, 247, 0.35), inset 0 0 15px rgba(168, 85, 247, 0.12);
-}
-
-.glow-cyan {
-  box-shadow: 0 0 25px rgba(0, 240, 255, 0.35), inset 0 0 15px rgba(0, 240, 255, 0.12);
+  box-shadow: 0 0 25px rgba(255, 183, 3, 0.28), inset 0 0 15px rgba(255, 183, 3, 0.08);
 }
 
 .text-glow-amber {
-  text-shadow: 0 0 14px rgba(255, 170, 0, 0.85), 0 0 28px rgba(255, 170, 0, 0.45);
+  text-shadow: 0 0 16px rgba(255, 183, 3, 0.75), 0 0 32px rgba(255, 183, 3, 0.35);
 }
 
-.text-glow-pink {
-  text-shadow: 0 0 14px rgba(255, 0, 85, 0.85), 0 0 28px rgba(255, 0, 85, 0.45);
+/* Secondary Accent: Electric Teal #00F5D4 Lighting Effects */
+.glow-teal {
+  box-shadow: 0 0 25px rgba(0, 245, 212, 0.28), inset 0 0 15px rgba(0, 245, 212, 0.08);
 }
 
-.text-glow-orange {
-  text-shadow: 0 0 14px rgba(249, 115, 22, 0.8), 0 0 28px rgba(249, 115, 22, 0.35);
+.text-glow-teal {
+  text-shadow: 0 0 16px rgba(0, 245, 212, 0.75), 0 0 32px rgba(0, 245, 212, 0.35);
 }
 
-.text-glow-purple {
-  text-shadow: 0 0 14px rgba(168, 85, 247, 0.8);
+/* Tertiary Accent: Soft Mint #80ED99 Lighting Effects */
+.glow-mint {
+  box-shadow: 0 0 20px rgba(128, 237, 153, 0.25), inset 0 0 10px rgba(128, 237, 153, 0.06);
 }
 
-.text-glow-cyan {
-  text-shadow: 0 0 14px rgba(0, 240, 255, 0.8), 0 0 28px rgba(0, 240, 255, 0.35);
+.text-glow-mint {
+  text-shadow: 0 0 14px rgba(128, 237, 153, 0.65);
 }
 
-/* Angular Game HUD Silhouettes */
-.hud-clip-nav {
-  clip-path: polygon(0 0, 100% 0, 95% 100%, 5% 100%);
-}
-
-.hud-clip-btn {
-  clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
-}
-
+/* Snap Section */
 .snap-section {
   scroll-snap-align: start;
   scroll-snap-stop: normal;
 }
 
-/* Aurora Gradient Mesh in Background */
+/* Atmospheric Research Lab Gradient Mesh (Amber, Teal, Mint over Obsidian Charcoal) */
 .aurora-mesh {
   background: 
-    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(249, 115, 22, 0.12), transparent),
-    radial-gradient(ellipse 60% 40% at 90% 40%, rgba(168, 85, 247, 0.10), transparent),
-    radial-gradient(ellipse 50% 50% at 10% 80%, rgba(0, 240, 255, 0.08), transparent);
+    radial-gradient(ellipse 85% 55% at 50% -20%, rgba(255, 183, 3, 0.08), transparent),
+    radial-gradient(ellipse 65% 45% at 90% 40%, rgba(0, 245, 212, 0.06), transparent),
+    radial-gradient(ellipse 55% 55% at 10% 80%, rgba(128, 237, 153, 0.04), transparent);
 }
 
 html.light-theme .aurora-mesh,
 html.light .aurora-mesh {
   background: 
-    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(249, 115, 22, 0.07), transparent),
-    radial-gradient(ellipse 60% 40% at 90% 40%, rgba(168, 85, 247, 0.06), transparent),
-    radial-gradient(ellipse 50% 50% at 10% 80%, rgba(14, 165, 233, 0.05), transparent);
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(217, 119, 6, 0.06), transparent),
+    radial-gradient(ellipse 60% 40% at 90% 40%, rgba(13, 148, 136, 0.05), transparent),
+    radial-gradient(ellipse 50% 50% at 10% 80%, rgba(22, 163, 74, 0.04), transparent);
 }
 
-/* Technical Vector Grid Overlay */
+/* Subtle Technical Vector Grid Overlay */
 .cyber-grid-pattern {
   background-color: transparent !important;
   background-image: 
-    linear-gradient(to right, rgba(249, 115, 22, 0.04) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(249, 115, 22, 0.04) 1px, transparent 1px);
-  background-size: 44px 44px;
+    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 48px 48px;
 }
 
 html.light-theme .cyber-grid-pattern,
 html.light .cyber-grid-pattern {
   background-color: transparent !important;
   background-image: 
-    linear-gradient(to right, rgba(100, 116, 139, 0.06) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(100, 116, 139, 0.06) 1px, transparent 1px);
-  background-size: 44px 44px;
+    linear-gradient(to right, rgba(15, 23, 42, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(15, 23, 42, 0.04) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+/* Subtle Noise Texture for Obsidian Charcoal Depth */
+.obsidian-noise {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.035'/%3E%3C/svg%3E");
 }
 
 /* 3D Perspective Card Support */
@@ -172,14 +331,14 @@ html.light .cyber-grid-pattern {
   backface-visibility: hidden;
 }
 
-/* Custom Scrollbar */
+/* Premium Minimalist Scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #09090b;
+  background: #080808;
 }
 
 html.light-theme ::-webkit-scrollbar-track,
@@ -189,69 +348,45 @@ html.light ::-webkit-scrollbar-track {
 
 ::-webkit-scrollbar-thumb {
   background: #27272a;
-  border-radius: 2px;
-  border: 1px solid rgba(249, 115, 22, 0.3);
-}
-
-html.light-theme ::-webkit-scrollbar-thumb,
-html.light ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border: 1px solid rgba(168, 85, 247, 0.4);
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(249, 115, 22, 0.7);
-  box-shadow: 0 0 10px rgba(249, 115, 22, 0.5);
+  background: #FFB703;
+  box-shadow: 0 0 10px rgba(255, 183, 3, 0.5);
 }
 
-/* Glitch text effect keyframes */
-@keyframes cyber-glitch {
-  0% { transform: translate(0); }
-  20% { transform: translate(-2px, 2px); }
-  40% { transform: translate(-2px, -2px); }
-  60% { transform: translate(2px, 2px); }
-  80% { transform: translate(2px, -2px); }
-  100% { transform: translate(0); }
+/* Selection Color with Amber Accent */
+::selection {
+  background-color: rgba(255, 183, 3, 0.25);
+  color: #FFFFFF;
 }
 
-.glitch-hover:hover {
-  animation: cyber-glitch 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
-}
-
-/* Ambient Pulse Line */
-@keyframes scanline {
-  0% { transform: translateY(-100%); }
-  100% { transform: translateY(1000%); }
-}
-
-.animate-scanline {
-  animation: scanline 8s linear infinite;
-}
-
-/* Subtle CRT Scanline & Vignette Overlay */
+/* Gentle CRT Scanlines */
 .crt-scanlines {
   background: repeating-linear-gradient(
     0deg,
-    rgba(0, 0, 0, 0.16),
-    rgba(0, 0, 0, 0.16) 1.5px,
+    rgba(0, 0, 0, 0.12),
+    rgba(0, 0, 0, 0.12) 1.5px,
     transparent 1.5px,
     transparent 3px
   );
-  opacity: 0.08;
+  opacity: 0.06;
   transition: opacity 0.3s ease;
 }
 
 html.light-theme .crt-scanlines,
 html.light .crt-scanlines {
-  opacity: 0.015;
+  opacity: 0.01;
 }
 
 .crt-vignette {
   background: radial-gradient(
     ellipse at center,
-    transparent 55%,
-    rgba(9, 9, 11, 0.45) 85%,
-    rgba(9, 9, 11, 0.85) 100%
+    transparent 60%,
+    rgba(8, 8, 8, 0.5) 85%,
+    rgba(8, 8, 8, 0.92) 100%
   );
   transition: background 0.3s ease;
 }

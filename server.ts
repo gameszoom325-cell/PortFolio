@@ -9,7 +9,21 @@ const __dirname = path.dirname(__filename);
 
 async function startServer() {
   const app = express();
-  const PORT = Number(process.env.PORT) || 3000;
+
+  // Parse command line flags (--port <number>, --host <string>) or fallback to env vars / defaults
+  let cliPort: number | undefined;
+  let cliHost: string | undefined;
+  for (let i = 2; i < process.argv.length; i++) {
+    if (process.argv[i] === '--port' && process.argv[i + 1]) {
+      cliPort = Number(process.argv[i + 1]);
+    }
+    if (process.argv[i] === '--host' && process.argv[i + 1]) {
+      cliHost = process.argv[i + 1];
+    }
+  }
+
+  const PORT = cliPort || Number(process.env.PORT) || 3000;
+  const HOST = cliHost || process.env.HOST || '0.0.0.0';
   const isProd = process.env.NODE_ENV === 'production';
 
   app.use(express.json());
@@ -37,7 +51,7 @@ async function startServer() {
     // Development mode: attach Vite middleware
     const { createServer } = await import('vite');
     const vite = await createServer({
-      server: { middlewareMode: true, host: '0.0.0.0', port: PORT },
+      server: { middlewareMode: true, host: HOST, port: PORT },
       appType: 'spa',
     });
     app.use(vite.middlewares);
@@ -50,8 +64,8 @@ async function startServer() {
     });
   }
 
-  app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Command Center running at http://localhost:${PORT} (${isProd ? 'production' : 'development'})`);
+  app.listen(PORT, HOST, () => {
+    console.log(`Command Center running at http://${HOST}:${PORT} (${isProd ? 'production' : 'development'})`);
   });
 }
 

@@ -30,6 +30,9 @@ import AIAssistantWidget from './components/AIAssistantWidget';
 import JourneyTimeline from './components/JourneyTimeline';
 import CustomCursor from './components/CustomCursor';
 import HolographicProjectCard, { ProjectData } from './components/HolographicProjectCard';
+import AboutStorySection from './components/AboutStorySection';
+import InteractiveSkillEcosystem from './components/InteractiveSkillEcosystem';
+import AchievementsSection from './components/AchievementsSection';
 import { initParticleStarfield } from './particles';
 import { cyberSound } from './utils/audioSystem';
 
@@ -179,49 +182,49 @@ function LiveNeuralPipelineDiagnostics({ isLightMode }: { isLightMode: boolean }
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: false, amount: 0.2 }}
       transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
-      className={`rounded-3xl p-6 sm:p-8 border transition-all ${
+      className={`crystal-glass crystal-glass-hover-teal p-6 sm:p-8 relative ${
         isLightMode
-          ? 'bg-white/45 backdrop-blur-2xl border border-white/80 text-slate-900 shadow-[0_8px_32px_rgba(15,23,42,0.08)]'
-          : 'bg-[#090d16]/85 backdrop-blur-2xl border border-zinc-800 text-zinc-100 shadow-2xl'
+          ? 'bg-white/80 border-slate-200/80 shadow-[0_16px_45px_rgba(15,23,42,0.08)]'
+          : 'bg-[rgba(10,10,15,0.72)] border-white/10 text-[#FFFFFF] shadow-2xl'
       }`}
     >
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-500/20 pb-4 mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-4 mb-6">
         <div>
-          <div className={`text-xs font-mono tracking-widest ${isLightMode ? 'text-[#c2410c] font-semibold' : 'text-amber-400'}`}>
+          <div className={`text-xs font-mono tracking-widest ${isLightMode ? 'text-[#c2410c] font-semibold' : 'text-[#FFB703]'}`}>
             // TELEMETRY ENGINE 03
           </div>
-          <h3 className={`text-2xl font-bold font-tech ${isLightMode ? 'text-slate-950 font-extrabold' : 'text-white'}`}>
+          <h3 className={`text-2xl font-bold font-tech ${isLightMode ? 'text-slate-950 font-extrabold' : 'text-[#FFFFFF]'}`}>
             Live AI Neural Pipeline &amp; Model Diagnostics
           </h3>
         </div>
         <div className="flex items-center gap-2">
-          <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping" />
-          <span className="text-xs font-mono text-emerald-500 font-bold">STREAM ACTIVE // 60Hz</span>
+          <span className="w-2.5 h-2.5 rounded-full bg-[#80ED99] animate-ping" />
+          <span className="text-xs font-mono text-[#80ED99] font-bold">STREAM ACTIVE // 60Hz</span>
         </div>
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
-        <div className={`p-4 rounded-2xl border ${isLightMode ? 'bg-white/70 border-slate-200' : 'bg-black/40 border-zinc-800'}`}>
-          <span className="text-[10px] font-mono text-zinc-400 block">TRAINING EPOCH</span>
-          <span className="text-xl font-mono font-bold text-amber-500">{epoch}</span>
+        <div className={`p-4 rounded-2xl border ${isLightMode ? 'bg-white/70 border-slate-200' : 'bg-black/40 border-white/10'}`}>
+          <span className="text-[10px] font-mono text-[#9CA3AF] block">TRAINING EPOCH</span>
+          <span className="text-xl font-mono font-bold text-[#FFB703]">{epoch}</span>
         </div>
-        <div className={`p-4 rounded-2xl border ${isLightMode ? 'bg-white/70 border-slate-200' : 'bg-black/40 border-zinc-800'}`}>
-          <span className="text-[10px] font-mono text-zinc-400 block">CROSS-ENTROPY LOSS</span>
-          <span className="text-xl font-mono font-bold text-cyan-500">{loss}</span>
+        <div className={`p-4 rounded-2xl border ${isLightMode ? 'bg-white/70 border-slate-200' : 'bg-black/40 border-white/10'}`}>
+          <span className="text-[10px] font-mono text-[#9CA3AF] block">CROSS-ENTROPY LOSS</span>
+          <span className="text-xl font-mono font-bold text-[#00F5D4]">{loss}</span>
         </div>
-        <div className={`p-4 rounded-2xl border ${isLightMode ? 'bg-white/70 border-slate-200' : 'bg-black/40 border-zinc-800'}`}>
-          <span className="text-[10px] font-mono text-zinc-400 block">GPU VRAM LOAD</span>
-          <span className="text-xl font-mono font-bold text-pink-500">6.8 / 16 GB</span>
+        <div className={`p-4 rounded-2xl border ${isLightMode ? 'bg-white/70 border-slate-200' : 'bg-black/40 border-white/10'}`}>
+          <span className="text-[10px] font-mono text-[#9CA3AF] block">GPU VRAM LOAD</span>
+          <span className="text-xl font-mono font-bold text-[#FFB703]">6.8 / 16 GB</span>
         </div>
-        <div className={`p-4 rounded-2xl border ${isLightMode ? 'bg-white/70 border-slate-200' : 'bg-black/40 border-zinc-800'}`}>
-          <span className="text-[10px] font-mono text-zinc-400 block">EDGE INFERENCE</span>
-          <span className="text-xl font-mono font-bold text-emerald-500">18.4 ms</span>
+        <div className={`p-4 rounded-2xl border ${isLightMode ? 'bg-white/70 border-slate-200' : 'bg-black/40 border-white/10'}`}>
+          <span className="text-[10px] font-mono text-[#9CA3AF] block">EDGE INFERENCE</span>
+          <span className="text-xl font-mono font-bold text-[#80ED99]">18.4 ms</span>
         </div>
       </div>
 
       {/* Interactive Pipeline Nodes */}
       <div className="space-y-3">
-        <span className="text-xs font-mono text-zinc-400 block">// ACTIVE NEURAL CLUSTERS (CLICK TO PROBE)</span>
+        <span className="text-xs font-mono text-[#9CA3AF] block">// ACTIVE NEURAL CLUSTERS (CLICK TO PROBE)</span>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {['XGBoost Surrogate', 'Vision Transformer (ViT)', 'QUBO Hamiltonian Solver'].map((node) => (
             <button
@@ -235,14 +238,14 @@ function LiveNeuralPipelineDiagnostics({ isLightMode }: { isLightMode: boolean }
                 activeNode === node
                   ? isLightMode
                     ? 'bg-amber-500/15 border-amber-500 text-[#9a3412] font-bold shadow-sm'
-                    : 'bg-amber-500/20 border-amber-400 text-amber-300 shadow-[0_0_12px_rgba(255,170,0,0.3)]'
+                    : 'bg-[#FFB703]/20 border-[#FFB703] text-[#FFB703] shadow-[0_0_15px_rgba(255,183,3,0.3)]'
                   : isLightMode
                     ? 'bg-white/70 border-slate-200 text-slate-700 hover:border-slate-300'
-                    : 'bg-zinc-900/60 border-zinc-800 text-zinc-400 hover:border-zinc-700'
+                    : 'bg-white/5 border-white/10 text-[#9CA3AF] hover:border-white/20 hover:text-white'
               }`}
             >
               <span>{node}</span>
-              <Activity className="w-3.5 h-3.5 text-emerald-500" />
+              <Activity className="w-3.5 h-3.5 text-[#80ED99]" />
             </button>
           ))}
         </div>
@@ -420,7 +423,7 @@ export default function App() {
       const progress = total > 0 ? (window.scrollY / total) * 100 : 0;
       setScrollProgress(progress);
 
-      const sections = ['hero', 'projects', 'case-studies', 'neural-telemetry', 'timeline', 'skills', 'contact'];
+      const sections = ['hero', 'about', 'projects', 'case-studies', 'neural-telemetry', 'timeline', 'skills', 'achievements', 'contact'];
       for (const sectionId of sections) {
         const el = document.getElementById(sectionId);
         if (el) {
@@ -580,12 +583,12 @@ export default function App() {
           3. ADAPTIVE READABILITY OVERLAYS (zIndex: 3)
           ========================================================================= */}
       <div
-        className="fixed inset-0 pointer-events-none transition-all duration-700 z-[3]"
+        className="fixed inset-0 pointer-events-none transition-all duration-700 z-[3] obsidian-noise"
         style={{
           transform: `translate3d(${bgOffset.x * 3}px, ${bgOffset.y * 3}px, 0)`,
           background: isLightMode
-            ? "radial-gradient(circle at center, rgba(255, 255, 255, 0.12) 0%, rgba(226, 232, 240, 0.48) 100%)"
-            : "radial-gradient(circle at center, rgba(3, 7, 18, 0.55) 0%, rgba(3, 7, 18, 0.82) 100%)"
+            ? "radial-gradient(circle at center, rgba(255, 255, 255, 0.2) 0%, rgba(241, 245, 249, 0.75) 100%)"
+            : "radial-gradient(ellipse 85% 55% at 50% -20%, rgba(255, 183, 3, 0.08), transparent), radial-gradient(ellipse 65% 45% at 90% 40%, rgba(0, 245, 212, 0.06), transparent), radial-gradient(circle at center, rgba(8, 8, 8, 0.65) 0%, rgba(8, 8, 8, 0.88) 100%)"
         }}
       />
 
@@ -597,10 +600,10 @@ export default function App() {
         preload="auto"
       />
 
-      {/* Top Neon Scroll Progress Indicator */}
-      <div className={`fixed top-0 left-0 w-full h-[2px] z-50 pointer-events-none ${isLightMode ? 'bg-slate-200' : 'bg-slate-900/60'}`}>
+      {/* Top Gradient Scroll Progress Indicator: Amber to Teal to Mint */}
+      <div className={`fixed top-0 left-0 w-full h-[2px] z-50 pointer-events-none ${isLightMode ? 'bg-slate-200' : 'bg-black/60'}`}>
         <div
-          className="h-full bg-gradient-to-r from-orange-500 via-amber-400 to-pink-500 shadow-[0_0_12px_#f97316] transition-all duration-75"
+          className="h-full bg-gradient-to-r from-[#FFB703] via-[#00F5D4] to-[#80ED99] shadow-[0_0_12px_rgba(255,183,3,0.5)] transition-all duration-75"
           style={{ width: `${scrollProgress}%` }}
         />
       </div>
@@ -620,8 +623,8 @@ export default function App() {
           ========================================================================= */}
       <header className={`fixed top-0 left-0 right-0 z-40 h-16 px-4 sm:px-8 flex items-center justify-between transition-colors duration-300 ${
         isLightMode
-          ? 'bg-white/50 backdrop-blur-xl border-b border-white/60 shadow-xs text-slate-900'
-          : 'bg-black/60 backdrop-blur-md border-b border-zinc-800/80 text-white'
+          ? 'bg-white/70 backdrop-blur-xl border-b border-slate-200 text-slate-900'
+          : 'bg-[#080808]/80 backdrop-blur-xl border-b border-white/10 text-white'
       }`}>
         {/* Left Brand Cluster */}
         <a
@@ -634,27 +637,27 @@ export default function App() {
           onMouseEnter={() => cyberSound.playHover()}
           className="flex items-center gap-3 group cursor-pointer"
         >
-          <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/40 flex items-center justify-center text-amber-400 font-bold text-lg shadow-[0_0_12px_rgba(255,170,0,0.2)] group-hover:border-amber-400 transition-all">
-            <Sparkles className="w-5 h-5 text-amber-400 pointer-events-none" />
+          <div className="w-10 h-10 rounded-xl bg-[#FFB703]/10 border border-[#FFB703]/40 flex items-center justify-center text-[#FFB703] font-bold text-lg shadow-[0_0_12px_rgba(255,183,3,0.25)] group-hover:border-[#FFB703] transition-all">
+            <Sparkles className="w-5 h-5 text-[#FFB703] pointer-events-none" />
           </div>
           <div className="flex flex-col">
             <span className={`font-bold tracking-wider text-base leading-none font-tech transition-colors ${
-              isLightMode ? 'text-slate-950 group-hover:text-amber-700' : 'text-white group-hover:text-amber-300'
+              isLightMode ? 'text-slate-950 group-hover:text-amber-700' : 'text-[#FFFFFF] group-hover:text-[#FFB703]'
             }`}>
               AYUSH SINGH
             </span>
-            <span className="font-mono text-[10px] text-amber-500 tracking-widest mt-1">
-              SRM IST // AI COMMAND CENTER
+            <span className="font-mono text-[10px] text-[#FFB703] tracking-widest mt-1">
+              SRM IST // AI RESEARCH LAB
             </span>
           </div>
         </a>
 
         {/* Center Subsystem Status Beacon */}
         <div className="hidden lg:flex items-center gap-4 text-xs font-mono">
-          <div className="flex items-center gap-2 px-3 py-1 rounded-full border border-zinc-500/20">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-            <span className={isLightMode ? 'text-slate-700 font-medium' : 'text-zinc-300'}>
-              QUANTUM ISING HAMILTONIANS [ONLINE]
+          <div className="flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/5">
+            <span className="w-2 h-2 rounded-full bg-[#80ED99] animate-ping" />
+            <span className={isLightMode ? 'text-slate-700 font-medium' : 'text-[#9CA3AF]'}>
+              HAMILTONIAN INFERENCE [<span className="text-[#80ED99] font-bold">ONLINE</span>]
             </span>
           </div>
         </div>
@@ -669,11 +672,11 @@ export default function App() {
             className={`px-2.5 py-1.5 rounded-xl text-xs font-mono transition-all cursor-pointer flex items-center gap-1.5 shadow-sm ${
               isLightMode
                 ? 'bg-white/80 border border-slate-300 text-slate-800 hover:border-amber-500'
-                : 'bg-zinc-900/80 border border-zinc-700 text-zinc-300 hover:border-amber-400 hover:text-amber-300'
+                : 'bg-white/5 border border-white/10 text-[#9CA3AF] hover:border-[#FFB703]/40 hover:text-[#FFB703]'
             }`}
             title="Replay System Boot Sequence"
           >
-            <RotateCcw className="w-3.5 h-3.5 text-amber-500 pointer-events-none" />
+            <RotateCcw className="w-3.5 h-3.5 text-[#FFB703] pointer-events-none" />
             <span className="hidden sm:inline pointer-events-none">[ BOOT ]</span>
           </button>
 
@@ -685,7 +688,7 @@ export default function App() {
             className={`px-3 py-1.5 rounded-xl text-xs font-mono transition-all cursor-pointer flex items-center gap-1.5 select-none shadow-sm ${
               isLightMode
                 ? 'bg-white/90 border border-slate-300 text-slate-900 hover:border-amber-500'
-                : 'bg-slate-900/90 border border-zinc-700 text-amber-300 hover:border-amber-400'
+                : 'bg-white/5 border border-white/10 text-[#FFB703] hover:border-[#FFB703]/40'
             }`}
             aria-label="Toggle Theme"
           >
@@ -696,7 +699,7 @@ export default function App() {
               </>
             ) : (
               <>
-                <Sun className="w-3.5 h-3.5 text-amber-400 pointer-events-none" />
+                <Sun className="w-3.5 h-3.5 text-[#FFB703] pointer-events-none" />
                 <span className="font-bold pointer-events-none">[ ☼ LIGHT ]</span>
               </>
             )}
@@ -709,30 +712,30 @@ export default function App() {
             onMouseEnter={() => cyberSound.playHover()}
             className={`relative z-50 pointer-events-auto px-3.5 py-1.5 rounded-xl text-xs font-mono transition-all flex items-center gap-1.5 cursor-pointer shadow-sm select-none ${
               isSoundOn
-                ? 'bg-black/85 border border-amber-400 text-amber-300 shadow-[0_0_12px_rgba(255,170,0,0.35)]'
+                ? 'bg-[rgba(255,255,255,0.06)] border border-[#FFB703]/50 text-[#FFB703] shadow-[0_0_12px_rgba(255,183,3,0.3)]'
                 : isLightMode
                   ? 'bg-white/85 border border-slate-300 text-slate-500 hover:border-slate-400'
-                  : 'bg-slate-900/80 border border-zinc-700 text-zinc-400 hover:border-zinc-500'
+                  : 'bg-white/5 border border-white/10 text-[#9CA3AF] hover:border-white/20'
             }`}
             title={isSoundOn ? 'Disable Sound' : 'Enable Sound'}
             aria-label="Sound Control"
           >
             {isSoundOn ? (
               <>
-                <Volume2 className="w-3.5 h-3.5 text-amber-400 animate-pulse pointer-events-none" />
-                <span className="font-semibold text-amber-300 pointer-events-none">🔊 Sound ON</span>
+                <Volume2 className="w-3.5 h-3.5 text-[#FFB703] animate-pulse pointer-events-none" />
+                <span className="font-semibold text-[#FFB703] pointer-events-none">🔊 Sound ON</span>
               </>
             ) : (
               <>
-                <VolumeX className="w-3.5 h-3.5 text-zinc-400 pointer-events-none" />
+                <VolumeX className="w-3.5 h-3.5 text-[#9CA3AF] pointer-events-none" />
                 <span className="pointer-events-none">🔇 Sound OFF</span>
               </>
             )}
           </button>
 
           {/* SIH 2026 Event Badge */}
-          <div className="bg-gradient-to-r from-orange-500 to-fuchsia-600 text-white font-bold text-xs px-3 sm:px-4 py-1.5 rounded-xl shadow-[0_0_15px_rgba(249,115,22,0.4)] select-none whitespace-nowrap flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />
+          <div className="bg-gradient-to-r from-[#FFB703] to-[#80ED99] text-black font-bold text-xs px-3 sm:px-4 py-1.5 rounded-xl shadow-[0_0_15px_rgba(255,183,3,0.25)] select-none whitespace-nowrap flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-black animate-ping" />
             <span>SIH 2026</span>
           </div>
         </div>
@@ -787,51 +790,89 @@ export default function App() {
               </div>
             </div>
 
-            {/* Hero Text Content */}
+            {/* Hero Text Content in Glassmorphic Container (rgba(255,255,255,0.06)) */}
             <div className={`relative z-10 max-w-4xl mx-auto text-center space-y-6 transition-all duration-300 ${
               isLightMode
-                ? 'bg-white/40 backdrop-blur-xl border border-white/70 p-8 sm:p-12 rounded-3xl shadow-[0_8px_32px_rgba(15,23,42,0.06)]'
-                : 'bg-[#060a14]/65 backdrop-blur-xl border border-zinc-800/80 p-8 sm:p-12 rounded-3xl shadow-[0_0_40px_rgba(0,0,0,0.6)]'
+                ? 'bg-white/60 backdrop-blur-xl border border-slate-200 p-8 sm:p-12 rounded-3xl shadow-sm'
+                : 'bg-[rgba(255,255,255,0.06)] backdrop-blur-2xl border border-[rgba(255,255,255,0.1)] p-8 sm:p-12 rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.85)]'
             }`}>
               {/* Badges & Status Pills with subtle GSAP float */}
               <div className="flex flex-wrap items-center justify-center gap-2 text-xs font-mono gsap-float">
                 <span className={`px-3 py-1 rounded-full border flex items-center gap-1.5 ${
                   isLightMode
-                    ? 'bg-amber-500/15 border-amber-600/40 text-amber-900 font-mono shadow-sm backdrop-blur-md font-bold'
-                    : 'bg-black/60 border-amber-500/50 text-amber-300'
+                    ? 'bg-amber-500/10 border-amber-600/30 text-amber-900 font-mono shadow-sm backdrop-blur-md font-bold'
+                    : 'bg-white/5 border-white/10 text-[#9CA3AF]'
                 }`}>
-                  <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
+                  <span className="w-2 h-2 rounded-full bg-[#FFB703] animate-ping" />
                   SRM INSTITUTE OF SCIENCE AND TECHNOLOGY
                 </span>
                 <span className={`px-3 py-1 rounded-full border ${
                   isLightMode
                     ? 'bg-white/70 border-slate-300 text-slate-800 shadow-sm font-mono backdrop-blur-md font-semibold'
-                    : 'bg-black/60 border-pink-500/50 text-pink-300'
+                    : 'bg-[#00F5D4]/10 border-[#00F5D4]/30 text-[#00F5D4]'
                 }`}>
                   CSE (AI &amp; ML) · BATCH 2026 – 2030
                 </span>
                 <span className={`px-3 py-1 rounded-full border ${
                   isLightMode
                     ? 'bg-white/70 border-slate-300 text-slate-800 shadow-sm font-mono backdrop-blur-md font-semibold'
-                    : 'bg-black/60 border-emerald-500/50 text-emerald-300'
+                    : 'bg-[#80ED99]/10 border-[#80ED99]/30 text-[#80ED99]'
                 }`}>
                   SIH 2026 ACTIVE
                 </span>
               </div>
 
-              {/* Main Heading with Glitch Depth */}
-              <div className="space-y-2">
-                <h1 className={`text-4xl sm:text-6xl lg:text-7xl font-tech tracking-tight leading-tight ${
-                  isLightMode
-                    ? 'text-slate-950 font-black tracking-tight drop-shadow-sm'
-                    : 'font-bold text-white text-glow-amber drop-shadow-[0_4px_16px_rgba(0,0,0,0.95)]'
-                }`}>
-                  AYUSH SINGH
-                </h1>
+              {/* Main Heading with 3D Depth, Letter Blur-to-Sharp, and Light Sweep */}
+              <div className="space-y-3 relative overflow-visible">
+                {/* Subtle sweeping light across name */}
+                <motion.div
+                  initial={{ translateX: '-100%' }}
+                  animate={{ translateX: '250%' }}
+                  transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut' }}
+                  className="absolute inset-y-0 w-36 bg-gradient-to-r from-transparent via-[#FFB703]/20 to-transparent pointer-events-none blur-md z-20"
+                />
+
+                <div className="relative inline-block select-none">
+                  {/* 3D Extrusion Depth Layer */}
+                  <h1
+                    aria-hidden="true"
+                    className={`absolute inset-0 flex items-center justify-center text-4xl sm:text-6xl lg:text-7xl font-tech font-black tracking-tight leading-tight translate-y-1.5 translate-x-1.5 opacity-30 blur-[1px] pointer-events-none ${
+                      isLightMode ? 'text-amber-800' : 'text-[#FFB703]'
+                    }`}
+                  >
+                    AYUSH SINGH
+                  </h1>
+
+                  {/* Main Animated Letters */}
+                  <h1 className={`relative z-10 text-4xl sm:text-6xl lg:text-7xl font-tech tracking-tight leading-tight flex items-center justify-center flex-wrap ${
+                    isLightMode
+                      ? 'text-slate-950 font-black drop-shadow-sm'
+                      : 'font-bold text-[#FFFFFF] text-glow-amber drop-shadow-[0_4px_16px_rgba(0,0,0,0.95)]'
+                  }`}>
+                    {"AYUSH SINGH".split("").map((char, idx) => (
+                      <motion.span
+                        key={idx}
+                        initial={{ opacity: 0, filter: 'blur(10px)', y: 22, rotateX: 55 }}
+                        animate={{ opacity: 1, filter: 'blur(0px)', y: 0, rotateX: 0 }}
+                        transition={{
+                          duration: 0.55,
+                          delay: 0.15 + idx * 0.045,
+                          ease: [0.16, 1, 0.3, 1]
+                        }}
+                        className={`inline-block transition-transform hover:scale-110 cursor-default ${
+                          char === " " ? "w-3 sm:w-5" : ""
+                        }`}
+                      >
+                        {char}
+                      </motion.span>
+                    ))}
+                  </h1>
+                </div>
+
                 <p className={`text-lg sm:text-2xl font-tech tracking-wider ${
                   isLightMode
                     ? 'text-amber-800 font-mono font-bold tracking-widest'
-                    : 'bg-gradient-to-r from-amber-400 via-orange-500 to-pink-500 bg-clip-text text-transparent font-semibold drop-shadow-[0_4px_12px_rgba(0,0,0,0.95)]'
+                    : 'text-[#FFB703] font-mono font-bold tracking-widest'
                 }`}>
                   {portfolioData.tagline}
                 </p>
@@ -841,19 +882,19 @@ export default function App() {
               <p className={`max-w-2xl mx-auto text-xs sm:text-sm sm:leading-relaxed ${
                 isLightMode
                   ? 'text-slate-900 font-mono leading-relaxed font-semibold'
-                  : 'text-zinc-100 font-mono drop-shadow-[0_2px_6px_rgba(0,0,0,0.9)]'
+                  : 'text-[#9CA3AF] font-mono leading-relaxed'
               }`}>
                 Engineering statutory risk delay analytics with{' '}
-                <span className={isLightMode ? 'text-amber-900 bg-amber-100/80 px-1 py-0.5 rounded border border-amber-300/60 font-bold' : 'font-semibold text-amber-300'}>
+                <span className={isLightMode ? 'text-amber-900 bg-amber-100/80 px-1 py-0.5 rounded border border-amber-300/60 font-bold' : 'font-semibold text-[#FFB703]'}>
                   XGBoost &amp; SHAP explainability
                 </span>, and formulating hybrid{' '}
-                <span className={isLightMode ? 'text-amber-900 bg-amber-100/80 px-1 py-0.5 rounded border border-amber-300/60 font-bold' : 'font-semibold text-pink-400'}>
+                <span className={isLightMode ? 'text-amber-900 bg-amber-100/80 px-1 py-0.5 rounded border border-amber-300/60 font-bold' : 'font-semibold text-[#00F5D4]'}>
                   QUBO / QAOA quantum optimization
                 </span>{' '}
                 for renewable microgrid dispatch. Specialized in high-performance reactive interfaces and explainable machine intelligence.
               </p>
 
-              {/* Action CTA Buttons */}
+              {/* Action CTA Buttons: Amber Gold and Subtle Glass */}
               <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
                 <MagneticButton>
                   <a
@@ -864,7 +905,7 @@ export default function App() {
                       handleNavigateToSection('projects');
                     }}
                     onMouseEnter={() => cyberSound.playHover()}
-                    className="bg-gradient-to-r from-amber-500 to-orange-600 text-black font-semibold px-6 py-2.5 rounded-xl hover:shadow-[0_0_20px_rgba(255,170,0,0.5)] flex items-center gap-2 font-mono text-xs transition-all cursor-pointer shadow-md"
+                    className="bg-[#FFB703] text-black font-semibold px-6 py-2.5 rounded-xl hover:bg-[#ffc32b] hover:shadow-[0_0_20px_rgba(255,183,3,0.4)] flex items-center gap-2 font-mono text-xs transition-all cursor-pointer shadow-md"
                   >
                     <Cpu className="w-4 h-4 text-black pointer-events-none" />
                     <span className="pointer-events-none font-bold">VIEW SYSTEMS</span>
@@ -881,11 +922,11 @@ export default function App() {
                     className={`px-5 py-2.5 rounded-xl font-mono text-xs transition-all flex items-center gap-2 cursor-pointer shadow-sm border ${
                       isLightMode
                         ? 'bg-white border-slate-300 text-slate-800 hover:border-amber-500'
-                        : 'bg-slate-900/80 border-slate-700 text-slate-200 hover:border-pink-500/60'
+                        : 'bg-white/5 border-white/10 text-white hover:border-[#00F5D4]/40 hover:text-[#00F5D4]'
                     }`}
                     title="Copy Email"
                   >
-                    <Mail className="w-4 h-4 text-pink-500 pointer-events-none" />
+                    <Mail className="w-4 h-4 text-[#00F5D4] pointer-events-none" />
                     <span className="pointer-events-none">090109ayush@gmail.com</span>
                   </button>
                 </MagneticButton>
@@ -925,6 +966,11 @@ export default function App() {
             </motion.div>
           </div>
         </section>
+
+        {/* =========================================================================
+            ABOUT & IDENTITY DOSSIER (STORYTELLING MOTION & LAYERED DEPTH)
+            ========================================================================= */}
+        <AboutStorySection isLightMode={isLightMode} />
 
         {/* =========================================================================
             01. PROJECTS SECTION (PREMIUM 3D CARDS WITH PERSPECTIVE & SCHEMATICS - REQ 1)
@@ -985,16 +1031,16 @@ export default function App() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: false, amount: 0.2 }}
                 transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                className={`p-6 rounded-2xl border transition-all ${
+                className={`crystal-glass crystal-glass-hover-amber p-6 relative ${
                   isLightMode
-                    ? 'bg-white/45 hover:bg-white/60 backdrop-blur-xl border border-white/70 text-slate-900 shadow-[0_8px_30px_rgb(0,0,0,0.06)]'
-                    : 'bg-[#0b0f19]/85 backdrop-blur-xl border border-zinc-800 text-zinc-100 hover:border-amber-500/40'
+                    ? 'bg-white/80 border-slate-200/80 text-slate-900 shadow-sm'
+                    : 'bg-[rgba(10,10,15,0.72)] border-white/10 text-white hover:border-[#FFB703]/50 hover:shadow-[0_20px_45px_rgba(0,0,0,0.85),0_0_30px_rgba(255,183,3,0.12)]'
                 }`}
               >
-                <span className="text-3xl font-mono font-bold text-amber-500 block mb-2">{step.step}</span>
-                <h4 className={`text-lg font-bold font-tech mb-2 ${isLightMode ? 'text-slate-950' : 'text-white'}`}>{step.title}</h4>
-                <div className={`text-xs font-mono mb-3 ${isLightMode ? 'text-slate-600 font-medium' : 'text-zinc-400'}`}>{step.tech}</div>
-                <p className={`text-xs leading-relaxed ${isLightMode ? 'text-slate-800 font-medium' : 'text-zinc-300'}`}>{step.desc}</p>
+                <span className="text-3xl font-mono font-bold text-[#FFB703] block mb-2">{step.step}</span>
+                <h4 className={`text-lg font-bold font-tech mb-2 ${isLightMode ? 'text-slate-950' : 'text-[#FFFFFF]'}`}>{step.title}</h4>
+                <div className={`text-xs font-mono mb-3 ${isLightMode ? 'text-slate-600 font-medium' : 'text-[#00F5D4]'}`}>{step.tech}</div>
+                <p className={`text-xs leading-relaxed ${isLightMode ? 'text-slate-800 font-medium' : 'text-[#9CA3AF]'}`}>{step.desc}</p>
               </motion.div>
             ))}
           </div>
@@ -1013,60 +1059,14 @@ export default function App() {
         <JourneyTimeline isLightMode={isLightMode} />
 
         {/* =========================================================================
-            05. SKILLS SECTION
+            05. INTERACTIVE TECHNOLOGY ECOSYSTEM & SKILL MATRIX
             ========================================================================= */}
-        <section id="skills" className="py-12 sm:py-16 flex flex-col justify-center space-y-8 scroll-mt-24">
-          <div className="border-b border-zinc-500/20 pb-4">
-            <div className={`text-xs font-mono tracking-widest mb-1 ${
-              isLightMode ? 'text-[#c2410c] font-semibold' : 'text-amber-400'
-            }`}>
-              // SYSTEM MATRICES
-            </div>
-            <h2 className={`text-2xl sm:text-4xl font-tech ${
-              isLightMode ? 'text-slate-950 font-extrabold' : 'font-bold text-white'
-            }`}>
-              05. Technical Capabilities &amp; Stack Telemetry
-            </h2>
-          </div>
+        <InteractiveSkillEcosystem isLightMode={isLightMode} />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {portfolioData.skills.map((skillGroup) => (
-              <motion.div
-                key={skillGroup.category}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: false, amount: 0.2 }}
-                transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                className={`p-6 rounded-2xl border transition-all ${
-                  isLightMode
-                    ? 'bg-white/45 hover:bg-white/60 backdrop-blur-xl border border-white/70 text-slate-900 shadow-[0_8px_30px_rgb(0,0,0,0.06)]'
-                    : 'bg-[#0b0f19]/85 backdrop-blur-xl border border-zinc-800 text-zinc-100'
-                }`}
-              >
-                <h4 className={`text-base font-bold font-tech mb-4 flex items-center gap-2 ${
-                  isLightMode ? 'text-slate-950' : 'text-white'
-                }`}>
-                  <Sliders className="w-4 h-4 text-amber-500 pointer-events-none" />
-                  <span>{skillGroup.category}</span>
-                </h4>
-                <div className="flex flex-wrap gap-2">
-                  {skillGroup.items.map((skill) => (
-                    <span
-                      key={skill}
-                      className={`text-xs font-mono px-3 py-1.5 rounded-xl border ${
-                        isLightMode
-                          ? 'bg-white/80 border-slate-300 text-slate-800 font-medium'
-                          : 'bg-zinc-900/90 border-zinc-800 text-zinc-300'
-                      }`}
-                    >
-                      {skill}
-                    </span>
-                  ))}
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </section>
+        {/* =========================================================================
+            06. ACHIEVEMENTS & CREDENTIALS HOLOGRAPHIC VAULT
+            ========================================================================= */}
+        <AchievementsSection isLightMode={isLightMode} />
 
         {/* =========================================================================
             06. CONTACT TRANSMISSION SECTION
@@ -1077,29 +1077,29 @@ export default function App() {
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: false, amount: 0.2 }}
             transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
-            className={`rounded-3xl p-8 sm:p-12 text-center space-y-6 border transition-all ${
+            className={`crystal-glass crystal-glass-hover-amber p-8 sm:p-12 text-center space-y-6 relative ${
               isLightMode
-                ? 'bg-white/45 backdrop-blur-2xl border border-white/70 text-slate-900 shadow-[0_8px_30px_rgb(0,0,0,0.06)]'
-                : 'bg-[#0b0f19]/85 backdrop-blur-2xl border border-zinc-800 text-zinc-100 shadow-2xl'
+                ? 'bg-white/80 border-slate-200/80 text-slate-900 shadow-sm'
+                : 'bg-[rgba(10,10,15,0.76)] border-white/10 text-[#FFFFFF] shadow-2xl'
             }`}
           >
             <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono border ${
               isLightMode
-                ? 'bg-amber-500/15 border-amber-600/40 text-amber-900 font-mono shadow-sm backdrop-blur-md font-bold'
-                : 'bg-amber-950/80 border-amber-500/40 text-amber-300'
+                ? 'bg-amber-500/10 border-amber-600/30 text-amber-900 font-mono shadow-sm backdrop-blur-md font-bold'
+                : 'bg-white/5 border-white/10 text-[#FFB703]'
             }`}>
-              <Radio className="w-3.5 h-3.5 text-amber-500 animate-pulse pointer-events-none" />
+              <Radio className="w-3.5 h-3.5 text-[#FFB703] animate-pulse pointer-events-none" />
               <span>TRANSMISSION PROTOCOL OPEN</span>
             </div>
 
             <h2 className={`text-3xl sm:text-5xl font-tech ${
-              isLightMode ? 'text-slate-950 font-extrabold' : 'font-bold text-white'
+              isLightMode ? 'text-slate-950 font-extrabold' : 'font-bold text-[#FFFFFF]'
             }`}>
               Initialize Direct Transmission
             </h2>
 
             <p className={`max-w-2xl mx-auto text-xs sm:text-sm leading-relaxed ${
-              isLightMode ? 'text-slate-800 font-medium font-mono' : 'text-zinc-300 font-mono'
+              isLightMode ? 'text-slate-800 font-medium font-mono' : 'text-[#9CA3AF] font-mono'
             }`}>
               Available for AI/ML engineering, quantum computing modeling, SIH collaboration, and high-performance creative technology development.
             </p>
@@ -1112,7 +1112,7 @@ export default function App() {
                     handleCopyEmail();
                   }}
                   onMouseEnter={() => cyberSound.playHover()}
-                  className="px-8 py-4 rounded-xl bg-gradient-to-r from-orange-500 to-purple-600 hover:brightness-110 text-white font-mono font-bold text-xs shadow-lg transition-all flex items-center gap-2 cursor-pointer"
+                  className="px-8 py-4 rounded-xl bg-[#FFB703] hover:bg-[#ffc32b] text-black font-mono font-bold text-xs shadow-[0_0_25px_rgba(255,183,3,0.4)] transition-all flex items-center gap-2 cursor-pointer"
                 >
                   <Copy className="w-4 h-4 pointer-events-none" />
                   <span className="pointer-events-none">COPY: 090109ayush@gmail.com</span>
@@ -1126,19 +1126,19 @@ export default function App() {
       {/* Inspect Project Modal with AnimatePresence */}
       <AnimatePresence>
         {selectedProject && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className={`max-w-2xl w-full p-6 sm:p-8 rounded-3xl border shadow-2xl relative ${
-                isLightMode ? 'bg-white text-slate-900 border-slate-300' : 'bg-[#090d18] text-white border-zinc-800'
+              className={`max-w-2xl w-full p-6 sm:p-8 crystal-glass shadow-2xl relative ${
+                isLightMode ? 'bg-white/95 text-slate-900 border-slate-300' : 'bg-[rgba(10,10,15,0.92)] text-white border-white/12'
               }`}
             >
-              <div className="flex items-center justify-between border-b border-zinc-500/20 pb-4 mb-4">
+              <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-4">
                 <div>
-                  <span className="text-[10px] font-mono text-amber-500 block">{selectedProject.category}</span>
-                  <h3 className="text-xl font-bold font-tech">{selectedProject.title}</h3>
+                  <span className="text-[10px] font-mono text-[#FFB703] block">{selectedProject.category}</span>
+                  <h3 className="text-xl font-bold font-tech text-[#FFFFFF]">{selectedProject.title}</h3>
                 </div>
                 <button
                   onClick={() => {
@@ -1146,25 +1146,25 @@ export default function App() {
                     setSelectedProject(null);
                   }}
                   onMouseEnter={() => cyberSound.playHover()}
-                  className="px-3 py-1 rounded-lg border text-xs font-mono hover:bg-zinc-500/20 cursor-pointer"
+                  className="px-3 py-1 rounded-lg border text-xs font-mono hover:bg-white/10 cursor-pointer text-[#9CA3AF]"
                 >
                   ESC // CLOSE
                 </button>
               </div>
-              <p className="text-sm leading-relaxed mb-6">{selectedProject.description}</p>
+              <p className="text-sm leading-relaxed mb-6 text-[#9CA3AF]">{selectedProject.description}</p>
               
               <div className="grid grid-cols-3 gap-3 mb-6 font-mono text-xs">
-                <div className={`p-3 rounded-xl border ${isLightMode ? 'bg-slate-50 border-slate-200' : 'bg-zinc-900 border-zinc-800'}`}>
-                  <span className="text-[10px] text-zinc-400 block">ACCURACY</span>
-                  <span className="text-emerald-500 font-bold">{selectedProject.metrics.accuracy}</span>
+                <div className={`p-3 rounded-xl border ${isLightMode ? 'bg-slate-50 border-slate-200' : 'bg-white/5 border-white/10'}`}>
+                  <span className="text-[10px] text-[#9CA3AF] block">ACCURACY</span>
+                  <span className="text-[#80ED99] font-bold">{selectedProject.metrics.accuracy}</span>
                 </div>
-                <div className={`p-3 rounded-xl border ${isLightMode ? 'bg-slate-50 border-slate-200' : 'bg-zinc-900 border-zinc-800'}`}>
-                  <span className="text-[10px] text-zinc-400 block">LATENCY</span>
-                  <span className="text-amber-500 font-bold">{selectedProject.metrics.latency}</span>
+                <div className={`p-3 rounded-xl border ${isLightMode ? 'bg-slate-50 border-slate-200' : 'bg-white/5 border-white/10'}`}>
+                  <span className="text-[10px] text-[#9CA3AF] block">LATENCY</span>
+                  <span className="text-[#FFB703] font-bold">{selectedProject.metrics.latency}</span>
                 </div>
-                <div className={`p-3 rounded-xl border ${isLightMode ? 'bg-slate-50 border-slate-200' : 'bg-zinc-900 border-zinc-800'}`}>
-                  <span className="text-[10px] text-zinc-400 block">PARAMETERS</span>
-                  <span className="text-cyan-500 font-bold">{selectedProject.metrics.parameters}</span>
+                <div className={`p-3 rounded-xl border ${isLightMode ? 'bg-slate-50 border-slate-200' : 'bg-white/5 border-white/10'}`}>
+                  <span className="text-[10px] text-[#9CA3AF] block">PARAMETERS</span>
+                  <span className="text-[#00F5D4] font-bold">{selectedProject.metrics.parameters}</span>
                 </div>
               </div>
 
@@ -1174,7 +1174,7 @@ export default function App() {
                   <span
                     key={tech}
                     className={`text-[10px] font-mono px-2 py-0.5 rounded-md border ${
-                      isLightMode ? 'bg-slate-100 border-slate-200 text-slate-800' : 'bg-zinc-900 border-zinc-800 text-zinc-300'
+                      isLightMode ? 'bg-slate-100 border-slate-200 text-slate-800' : 'bg-[#00F5D4]/10 border-[#00F5D4]/30 text-[#00F5D4]'
                     }`}
                   >
                     {tech}
@@ -1189,7 +1189,7 @@ export default function App() {
                   rel="noreferrer"
                   onClick={() => cyberSound.playClick()}
                   onMouseEnter={() => cyberSound.playHover()}
-                  className="px-5 py-2.5 rounded-xl bg-amber-500 text-black font-semibold text-xs font-mono hover:bg-amber-400 cursor-pointer flex items-center gap-1.5 shadow-md"
+                  className="px-5 py-2.5 rounded-xl bg-[#FFB703] text-black font-semibold text-xs font-mono hover:bg-[#ffc32b] cursor-pointer flex items-center gap-1.5 shadow-[0_0_15px_rgba(255,183,3,0.35)]"
                 >
                   <span>LAUNCH PLATFORM</span>
                   <ExternalLink className="w-3.5 h-3.5" />

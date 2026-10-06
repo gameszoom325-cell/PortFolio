@@ -1,6 +1,8 @@
 // Ambient Particle Starfield Script with Theme Detection & 2D Elastic Collisions
-export const DARK_PARTICLE_PALETTE = ['#f97316', '#a855f7', '#fb923c', '#c084fc', '#e11d48'];
-export const LIGHT_PARTICLE_PALETTE = ['#334155', '#475569', '#64748b', '#94a3b8', '#7c3aed'];
+// Gradient Descent & Optimization inspired visual language:
+// #FFB703 (Amber Gold: current best solution), #00F5D4 (Electric Teal: exploration/search), #80ED99 (Soft Mint: successful convergence)
+export const DARK_PARTICLE_PALETTE = ['#FFB703', '#00F5D4', '#80ED99', '#FFB703', '#00F5D4'];
+export const LIGHT_PARTICLE_PALETTE = ['#d97706', '#0d9488', '#16a34a', '#475569', '#0d9488'];
 
 export function isCurrentThemeDark() {
   if (typeof document === 'undefined') return true;
@@ -188,10 +190,12 @@ export function initParticleStarfield(canvas, options = {}) {
           ctx.moveTo(p.x, p.y);
           ctx.lineTo(p2.x, p2.y);
           ctx.strokeStyle = isDark
-            ? p.color === '#f97316'
-              ? `rgba(249, 115, 22, ${alpha})`
-              : `rgba(168, 85, 247, ${alpha})`
-            : `rgba(71, 85, 105, ${alpha})`;
+            ? p.color === '#FFB703'
+              ? `rgba(255, 183, 3, ${alpha})`
+              : p.color === '#00F5D4'
+                ? `rgba(0, 245, 212, ${alpha})`
+                : `rgba(128, 237, 153, ${alpha})`
+            : `rgba(13, 148, 136, ${alpha})`;
           ctx.lineWidth = isDark ? 0.85 : 0.75;
           ctx.stroke();
         }

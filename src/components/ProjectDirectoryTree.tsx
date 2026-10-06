@@ -23,7 +23,7 @@ const PROJECT_TREE: TreeNode[] = [
     id: 'landwatch-ai',
     name: 'LandWatch AI',
     badge: 'SIH 2026',
-    badgeColor: 'bg-amber-500/10 border-amber-500/40 text-amber-400',
+    badgeColor: 'bg-[#FFB703]/10 border-[#FFB703]/40 text-[#FFB703]',
     linkId: 'landwatch',
     children: [
       { id: 'lw-1', name: 'xgboost_surrogate.py', badge: '0.942 AUC' },
@@ -35,7 +35,7 @@ const PROJECT_TREE: TreeNode[] = [
     id: 'ai-projects',
     name: 'AI Projects',
     badge: 'PyTorch',
-    badgeColor: 'bg-pink-500/10 border-pink-500/40 text-pink-400',
+    badgeColor: 'bg-[#00F5D4]/10 border-[#00F5D4]/40 text-[#00F5D4]',
     linkId: 'smart-farmer',
     children: [
       { id: 'ai-1', name: 'smart_farmer_vit.py', badge: '94.1% Acc' },
@@ -47,7 +47,7 @@ const PROJECT_TREE: TreeNode[] = [
     id: 'web-apps',
     name: 'Web Applications',
     badge: 'Production',
-    badgeColor: 'bg-emerald-500/10 border-emerald-500/40 text-emerald-400',
+    badgeColor: 'bg-[#80ED99]/10 border-[#80ED99]/40 text-[#80ED99]',
     linkId: 'landwatch',
     children: [
       { id: 'web-1', name: 'knoxxed1ts_motion.tsx', badge: '60 FPS' },
@@ -59,7 +59,7 @@ const PROJECT_TREE: TreeNode[] = [
     id: 'experiments',
     name: 'Experiments',
     badge: 'Quantum',
-    badgeColor: 'bg-cyan-500/10 border-cyan-500/40 text-cyan-400',
+    badgeColor: 'bg-[#00F5D4]/10 border-[#00F5D4]/40 text-[#00F5D4]',
     linkId: 'quantum-grid',
     children: [
       { id: 'exp-1', name: 'qubo_hamiltonian.py', badge: '24 Qubits' },
@@ -97,28 +97,28 @@ export default function ProjectDirectoryTree({ isLightMode, onSelectProject, onP
 
   return (
     <div
-      className={`rounded-2xl p-4 sm:p-5 border transition-all duration-300 shadow-xl overflow-hidden backdrop-blur-xl group hover:border-amber-500/50 ${
+      className={`crystal-glass crystal-glass-hover-amber p-4 sm:p-5 relative ${
         isLightMode
-          ? 'bg-white/45 border-white/70 shadow-[0_8px_30px_rgb(0,0,0,0.06)]'
-          : 'bg-[#0b0f19]/85 border-zinc-800 text-zinc-100 shadow-2xl hover:shadow-[0_0_25px_rgba(255,170,0,0.2)]'
+          ? 'bg-white/80 border-slate-200/80 shadow-[0_12px_35px_rgb(0,0,0,0.06)]'
+          : 'bg-[rgba(10,10,15,0.72)] border-white/10 text-white shadow-2xl hover:border-[#FFB703]/50 hover:shadow-[0_20px_45px_rgba(0,0,0,0.85),0_0_35px_rgba(255,183,3,0.12)]'
       }`}
     >
       {/* Directory Title Bar */}
-      <div className="flex items-center justify-between border-b border-zinc-500/20 pb-3 mb-3 text-xs font-mono">
+      <div className="flex items-center justify-between border-b border-white/10 pb-3 mb-3 text-xs font-mono">
         <div className="flex items-center gap-2">
-          <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-          <span className={`text-[11px] font-semibold ${isLightMode ? 'text-slate-800' : 'text-zinc-300'}`}>
+          <Sparkles className="w-3.5 h-3.5 text-[#FFB703]" />
+          <span className={`text-[11px] font-semibold ${isLightMode ? 'text-slate-800' : 'text-zinc-200'}`}>
             WORKSPACE DIRECTORY
           </span>
         </div>
-        <span className="text-[10px] font-mono text-zinc-400">
+        <span className="text-[10px] font-mono text-[#9CA3AF]">
           TREE // 4 REPOS
         </span>
       </div>
 
       {/* Root projects/ folder header */}
-      <div className="flex items-center gap-2 px-2 py-1 text-xs font-mono text-amber-500 font-bold mb-1">
-        <FolderOpen className="w-4 h-4 text-amber-400" />
+      <div className="flex items-center gap-2 px-2 py-1 text-xs font-mono text-[#FFB703] font-bold mb-1">
+        <FolderOpen className="w-4 h-4 text-[#FFB703]" />
         <span>projects/</span>
       </div>
 
@@ -138,18 +138,18 @@ export default function ProjectDirectoryTree({ isLightMode, onSelectProject, onP
                   isOpen
                     ? isLightMode
                       ? 'bg-amber-500/10 border-amber-500/30 text-amber-900 font-semibold'
-                      : 'bg-amber-500/15 border-amber-500/30 text-amber-300 shadow-[0_0_12px_rgba(255,170,0,0.15)]'
+                      : 'bg-[#FFB703]/15 border-[#FFB703]/30 text-[#FFB703] shadow-[0_0_12px_rgba(255,183,3,0.15)]'
                     : isLightMode
                       ? 'border-transparent hover:bg-slate-100/80 text-slate-700'
-                      : 'border-transparent hover:bg-zinc-800/60 text-zinc-300'
+                      : 'border-transparent hover:bg-white/5 text-zinc-300'
                 }`}
               >
                 <div className="flex items-center gap-2 overflow-hidden">
-                  <span className="text-zinc-500 select-none text-xs">{branchSymbol}</span>
+                  <span className="text-[#9CA3AF] select-none text-xs">{branchSymbol}</span>
                   {isOpen ? (
-                    <FolderOpen className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                    <FolderOpen className="w-3.5 h-3.5 text-[#FFB703] shrink-0" />
                   ) : (
-                    <Folder className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
+                    <Folder className="w-3.5 h-3.5 text-[#9CA3AF] shrink-0" />
                   )}
                   <span className="truncate">{node.name}</span>
                 </div>

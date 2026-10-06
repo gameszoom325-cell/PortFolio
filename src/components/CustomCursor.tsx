@@ -63,10 +63,10 @@ export default function CustomCursor({ isLightMode }: CustomCursorProps) {
           borderColor: isHovered
             ? isLightMode
               ? '#d97706'
-              : '#f59e0b'
+              : '#FFB703'
             : isLightMode
               ? 'rgba(100, 116, 139, 0.45)'
-              : 'rgba(255, 170, 0, 0.4)'
+              : 'rgba(255, 183, 3, 0.45)'
         }}
         transition={{ type: 'spring', stiffness: 500, damping: 28 }}
         className="fixed w-8 h-8 rounded-full border border-dashed pointer-events-none"
@@ -81,7 +81,7 @@ export default function CustomCursor({ isLightMode }: CustomCursorProps) {
         }}
         transition={{ type: 'spring', stiffness: 1000, damping: 50 }}
         className={`fixed w-1.5 h-1.5 rounded-full pointer-events-none ${
-          isLightMode ? 'bg-amber-600 shadow-sm' : 'bg-amber-400 shadow-[0_0_8px_#f59e0b]'
+          isLightMode ? 'bg-amber-600 shadow-sm' : 'bg-[#FFB703] shadow-[0_0_8px_#FFB703]'
         }`}
       />
     </div>

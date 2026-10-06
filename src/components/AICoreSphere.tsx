@@ -43,10 +43,11 @@ export default function AICoreSphere({ isLightMode, className = "" }: AICoreSphe
     const coreGroup = new THREE.Group();
     scene.add(coreGroup);
 
-    // Theme Colors
-    const primaryColor = isLightMode ? 0xd97706 : 0xf59e0b; // Amber
-    const secondaryColor = isLightMode ? 0x0284c7 : 0x06b6d4; // Cyan
-    const accentColor = isLightMode ? 0x9333ea : 0xec4899; // Pink / Magenta
+    // Theme Colors according to exact color system
+    // Primary: Amber Gold (#FFB703), Secondary: Electric Teal (#00F5D4), Tertiary: Soft Mint (#80ED99)
+    const primaryColor = isLightMode ? 0xd97706 : 0xFFB703; // Amber Gold
+    const secondaryColor = isLightMode ? 0x0d9488 : 0x00F5D4; // Electric Teal
+    const accentColor = isLightMode ? 0x16a34a : 0x80ED99; // Soft Mint
 
     // 1. Inner Core Nucleus (faceted crystal)
     const innerGeo = new THREE.IcosahedronGeometry(1.2, isMobile ? 0 : 1);
@@ -54,7 +55,7 @@ export default function AICoreSphere({ isLightMode, className = "" }: AICoreSphe
       color: primaryColor,
       wireframe: true,
       transparent: true,
-      opacity: isLightMode ? 0.65 : 0.82
+      opacity: isLightMode ? 0.65 : 0.85
     });
     const innerCore = new THREE.Mesh(innerGeo, innerMat);
     coreGroup.add(innerCore);
@@ -62,9 +63,9 @@ export default function AICoreSphere({ isLightMode, className = "" }: AICoreSphe
     // Inner soft solid glow sphere
     const solidGlowGeo = new THREE.SphereGeometry(0.82, isMobile ? 10 : 16, isMobile ? 10 : 16);
     const solidGlowMat = new THREE.MeshBasicMaterial({
-      color: isLightMode ? 0xf59e0b : 0xff7700,
+      color: isLightMode ? 0xd97706 : 0xFFB703,
       transparent: true,
-      opacity: isLightMode ? 0.2 : 0.35
+      opacity: isLightMode ? 0.2 : 0.32
     });
     const solidGlowMesh = new THREE.Mesh(solidGlowGeo, solidGlowMat);
     coreGroup.add(solidGlowMesh);

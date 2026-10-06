@@ -205,24 +205,24 @@ export default function TerminalDecoration({ isLightMode, onPlaySFX }: TerminalD
 
   return (
     <div
-      className={`rounded-2xl p-4 sm:p-5 border transition-all duration-300 shadow-xl overflow-hidden backdrop-blur-xl group hover:border-amber-500/50 ${
+      className={`crystal-glass crystal-glass-hover-amber p-4 sm:p-5 relative ${
         isLightMode
-          ? 'bg-white/45 border-white/70 shadow-[0_8px_30px_rgb(0,0,0,0.06)]'
-          : 'bg-[#0b0f19]/85 border-zinc-800 text-zinc-100 shadow-2xl hover:shadow-[0_0_25px_rgba(255,170,0,0.2)]'
+          ? 'bg-white/80 border-slate-200/80 shadow-[0_12px_35px_rgb(0,0,0,0.06)]'
+          : 'bg-[rgba(10,10,15,0.72)] border-white/10 text-white shadow-2xl hover:border-[#FFB703]/50 hover:shadow-[0_20px_45px_rgba(0,0,0,0.85),0_0_35px_rgba(255,183,3,0.12)]'
       }`}
     >
       {/* Terminal Title Bar */}
-      <div className="flex items-center justify-between border-b border-zinc-500/20 pb-3 mb-3 text-xs font-mono">
+      <div className="flex items-center justify-between border-b border-white/10 pb-3 mb-3 text-xs font-mono">
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-red-500/90 shadow-[0_0_6px_rgba(239,68,68,0.4)]" />
-            <span className="w-2.5 h-2.5 rounded-full bg-yellow-500/90 shadow-[0_0_6px_rgba(234,179,8,0.4)]" />
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/90 shadow-[0_0_6px_rgba(16,185,129,0.4)]" />
+            <span className="w-2.5 h-2.5 rounded-full bg-red-500/80" />
+            <span className="w-2.5 h-2.5 rounded-full bg-[#FFB703]/80" />
+            <span className="w-2.5 h-2.5 rounded-full bg-[#80ED99]/80" />
           </div>
           <span className={`text-[11px] font-semibold pl-2 flex items-center gap-1.5 ${
-            isLightMode ? 'text-slate-800' : 'text-zinc-300'
+            isLightMode ? 'text-slate-800' : 'text-zinc-200'
           }`}>
-            <Terminal className="w-3.5 h-3.5 text-amber-500" />
+            <Terminal className="w-3.5 h-3.5 text-[#FFB703]" />
             <span>{activeSnippet.title}</span>
           </span>
         </div>
@@ -234,11 +234,11 @@ export default function TerminalDecoration({ isLightMode, onPlaySFX }: TerminalD
             className={`p-1.5 rounded-lg border text-[10px] transition-colors cursor-pointer ${
               isLightMode
                 ? 'border-slate-300 hover:bg-slate-100 text-slate-700'
-                : 'border-zinc-800 hover:bg-zinc-800 text-zinc-400'
+                : 'border-white/10 hover:bg-white/10 text-[#9CA3AF]'
             }`}
             title={isPaused ? 'Resume Typing' : 'Pause Typing'}
           >
-            {isPaused ? <Play className="w-3 h-3 text-emerald-400" /> : <Pause className="w-3 h-3 text-amber-400" />}
+            {isPaused ? <Play className="w-3 h-3 text-[#80ED99]" /> : <Pause className="w-3 h-3 text-[#FFB703]" />}
           </button>
 
           {/* Copy Button */}
@@ -247,11 +247,11 @@ export default function TerminalDecoration({ isLightMode, onPlaySFX }: TerminalD
             className={`p-1.5 rounded-lg border text-[10px] transition-colors cursor-pointer ${
               isLightMode
                 ? 'border-slate-300 hover:bg-slate-100 text-slate-700'
-                : 'border-zinc-800 hover:bg-zinc-800 text-zinc-400'
+                : 'border-white/10 hover:bg-white/10 text-[#9CA3AF]'
             }`}
             title="Copy Code"
           >
-            {copied ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3 text-zinc-400" />}
+            {copied ? <Check className="w-3 h-3 text-[#80ED99]" /> : <Copy className="w-3 h-3 text-[#FFB703]" />}
           </button>
         </div>
       </div>

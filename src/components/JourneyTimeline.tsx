@@ -75,8 +75,18 @@ export default function JourneyTimeline({ isLightMode, onPlaySFX }: JourneyTimel
 
       {/* Futuristic Timeline Track */}
       <div className="relative">
-        {/* Center Glowing Laser Axis Line */}
-        <div className="absolute left-6 sm:left-1/2 top-4 bottom-4 w-[2px] -translate-x-1/2 bg-gradient-to-b from-amber-500 via-cyan-500 to-emerald-400 opacity-40 shadow-[0_0_12px_rgba(255,170,0,0.5)]" />
+        {/* Background Laser Guide Track */}
+        <div className="absolute left-6 sm:left-1/2 top-4 bottom-4 w-[2px] -translate-x-1/2 bg-zinc-800/60" />
+
+        {/* Self-Drawing Animated Laser Axis Line */}
+        <motion.div
+          initial={{ scaleY: 0 }}
+          whileInView={{ scaleY: 1 }}
+          viewport={{ once: false, amount: 0.1 }}
+          transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+          style={{ originY: 0 }}
+          className="absolute left-6 sm:left-1/2 top-4 bottom-4 w-[2px] -translate-x-1/2 bg-gradient-to-b from-amber-500 via-cyan-400 to-emerald-400 shadow-[0_0_15px_rgba(255,170,0,0.8)] z-10"
+        />
 
         <div className="space-y-12">
           {MILESTONES.map((item, idx) => {
@@ -86,11 +96,22 @@ export default function JourneyTimeline({ isLightMode, onPlaySFX }: JourneyTimel
             return (
               <motion.div
                 key={item.year}
-                initial={{ opacity: 0, y: 35 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                initial={{
+                  opacity: 0,
+                  x: isEven ? 40 : -40,
+                  filter: 'blur(6px)'
+                }}
+                whileInView={{
+                  opacity: 1,
+                  x: 0,
+                  filter: 'blur(0px)'
+                }}
                 viewport={{ once: false, amount: 0.25 }}
-                transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                onViewportEnter={onPlaySFX}
+                transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
+                onViewportEnter={() => {
+                  cyberSound.playScrollTick();
+                  if (onPlaySFX) onPlaySFX();
+                }}
                 className={`relative flex flex-col sm:flex-row items-start ${
                   isEven ? 'sm:flex-row-reverse' : ''
                 } gap-6 sm:gap-12 pl-14 sm:pl-0`}
@@ -111,17 +132,17 @@ export default function JourneyTimeline({ isLightMode, onPlaySFX }: JourneyTimel
                 {/* Content Card (Left or Right) */}
                 <div className="w-full sm:w-1/2">
                   <div
-                    className={`rounded-2xl p-6 sm:p-7 border transition-all duration-300 group hover:border-amber-500/50 ${
+                    className={`crystal-glass crystal-glass-hover-amber p-6 sm:p-7 relative transition-all duration-300 ${
                       isLightMode
-                        ? 'bg-white/45 hover:bg-white/60 backdrop-blur-xl border border-white/70 shadow-[0_8px_30px_rgb(0,0,0,0.06)]'
-                        : 'bg-[#0b0f19]/85 hover:bg-[#0d1322]/90 backdrop-blur-xl border border-zinc-800 text-zinc-100 shadow-2xl hover:shadow-[0_0_25px_rgba(255,170,0,0.2)]'
+                        ? 'bg-white/80 border-slate-200/80 shadow-[0_12px_35px_rgb(0,0,0,0.06)]'
+                        : 'bg-[rgba(10,10,15,0.72)] border-white/10 text-white shadow-2xl hover:border-[#FFB703]/50 hover:shadow-[0_20px_50px_rgba(0,0,0,0.85),0_0_35px_rgba(255,183,3,0.12)]'
                     }`}
                   >
                     <div className="flex items-center justify-between gap-2 mb-3">
                       <span className={`text-2xl sm:text-3xl font-tech font-black tracking-wider bg-gradient-to-r ${item.accent} bg-clip-text text-transparent`}>
                         {item.year}
                       </span>
-                      <span className="text-[10px] font-mono tracking-widest text-zinc-400 px-2 py-0.5 rounded border border-zinc-500/20">
+                      <span className="text-[10px] font-mono tracking-widest text-[#9CA3AF] px-2 py-0.5 rounded border border-white/10">
                         {item.telemetry}
                       </span>
                     </div>
@@ -133,26 +154,26 @@ export default function JourneyTimeline({ isLightMode, onPlaySFX }: JourneyTimel
                     </h3>
 
                     <div className={`text-xs font-mono mb-3 ${
-                      isLightMode ? 'text-amber-800 font-semibold' : 'text-amber-400'
+                      isLightMode ? 'text-amber-800 font-semibold' : 'text-[#FFB703]'
                     }`}>
                       {item.subtitle}
                     </div>
 
                     <p className={`text-xs sm:text-sm leading-relaxed mb-4 ${
-                      isLightMode ? 'text-slate-800 font-medium' : 'text-zinc-300'
+                      isLightMode ? 'text-slate-800 font-medium' : 'text-[#9CA3AF]'
                     }`}>
                       {item.description}
                     </p>
 
-                    {/* Skill Tags */}
-                    <div className="flex flex-wrap gap-1.5 pt-2 border-t border-zinc-500/15">
+                    {/* Skill Tags: Electric Teal / Amber */}
+                    <div className="flex flex-wrap gap-1.5 pt-2 border-t border-white/10">
                       {item.tags.map((tag) => (
                         <span
                           key={tag}
                           className={`text-[10px] font-mono px-2 py-0.5 rounded-md border ${
                             isLightMode
                               ? 'bg-white/80 border-slate-300 text-slate-800 font-medium'
-                              : 'bg-zinc-900 border-zinc-800 text-zinc-400'
+                              : 'bg-white/[0.03] border-white/10 text-[#00F5D4]'
                           }`}
                         >
                           {tag}
